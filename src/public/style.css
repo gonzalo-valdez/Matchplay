@@ -166,7 +166,7 @@ a {
 #register {
 	display:none;
 }
-#register__error {
+#message {
 	display: none;
 	position: absolute;
 	top: 90%;
