@@ -4,28 +4,32 @@
 	<meta charset="UTF-8">
 	<title>Matchplay Login</title>
 	<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/all.css'>
-	<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/fontawesome.css'><link rel="stylesheet" href="./style.css">
-	<script src="login.js"></script>
+	<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.2.0/css/fontawesome.css'>
+	<link rel="stylesheet" href="./style.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<script src="index.js"></script>
+	
 </head>
 <body>
 	<div class="container">
 		<div class="screen">
 			<div class="screen__content">
 				<img src="img/logosimple.png" class="logo">
-				<form class="login" id="login">
+				<form action="/login" method="POST" class="login" id="login">
 					<div class="login__field">
 						<i class="login__icon fas fa-user"></i>
-						<input type="text" class="login__input" placeholder="User name / Email">
+						<input type="text" class="login__input" placeholder="Username">
 					</div>
 					<div class="login__field">
 						<i class="login__icon fas fa-lock"></i>
 						<input type="password" class="login__input" placeholder="Password">
 					</div>
+					<br><br><br><br>
 					<button class="button login__submit">
-						<span class="button__text">Log In Now</span>
+						<span class="button__text">Log In</span>
 						<i class="button__icon fas fa-chevron-right"></i>
 					</button>
-					<button class="open__register" onclick="openRegister()">
+					<button type="button" class="open__register" onclick="openRegister()">
 						<span class="button__text">Register here</span>
 						<i class="button__icon fas fa-chevron-right"></i>
 					</button>			
@@ -33,13 +37,12 @@
 
 				
 
-				<form class="login" id="register">
+				<form action="/register" method="POST" class="login" id="register">
 					<span id="register__error">
-						
 					</span>
 					<div class="login__field">
 						<i class="login__icon fas fa-user"></i>
-						<input type="text" class="login__input" placeholder="User name / Email">
+						<input type="text" class="login__input" placeholder="Username">
 					</div>
 					<div class="login__field">
 						<i class="login__icon fas fa-lock"></i>
@@ -49,11 +52,11 @@
 						<i class="login__icon fas fa-lock"></i>
 						<input type="password" class="login__input" placeholder="Enter password again">
 					</div>
-					<button class="button open__register" onclick="registerAccount()">
+					<button class="button login__submit">
 						<span class="button__text">Register</span>
 						<i class="button__icon fas fa-chevron-right"></i>
 					</button>	
-					<button class="button open__register" onclick="closeRegister()">
+					<button type="button" class="button open__register" onclick="closeRegister()">
 						<span class="button__text">Go back</span>
 						<i class="button__icon fas fa-chevron-right"></i>
 					</button>			
