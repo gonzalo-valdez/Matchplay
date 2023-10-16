@@ -1,4 +1,38 @@
 $(document).ready(function() {
+    const token = localStorage.getItem('token');
+    let userData;
+    fetch('/userProfile', {
+        method: 'GET',
+        headers: {
+          'Authorization': token,
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => {
+        if (response.status === 200) {
+          return response.json(); // Parse the response as JSON
+        } else {
+          return response.json().then(data => {
+            if (data.redirect) {
+              // Redirect to the URL specified in the JSON response
+              window.location.href = data.redirect;
+            } else {
+              console.error('Error:', data.message);
+            }
+          });
+        }
+      })
+        .then(data => {
+          userData = data;
+          //load all data
+          $('.username').html(userData.username);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+        
+    
+
     const messageForm = $("#message-form");
     const messageInput = $("#message-input");
     const chatMessages = $("#chat-messages");

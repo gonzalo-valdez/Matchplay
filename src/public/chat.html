@@ -14,34 +14,65 @@
 
 	  <div class="chat-sidebar">
 		<div class="user-panel">
-			<span>username</span>
+			<img class="user-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="">
+			<span class="username"></span>
 			<button type="button"><i class="bi bi-three-dots-vertical"></i></button>
 		</div>
 		<div class="search-bar">
 		  	<input type="text" placeholder="Search chats">
 		</div>
 		<div class="chat-list">
-		  <!-- List of chats goes here -->
-		  <div class="chat-item">Chat 1</div>
-		  <div class="chat-item">Chat 2</div>
-		  <div class="chat-item">Chat 3</div>
+			<button type="button" class="chat-item">
+				<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="">
+				<div class="chat-info">
+					<div class="chat-info-timestamp">
+						<h4 class="chat-name">
+							Padel pibes
+						</h4>
+						<h5 class="chat-timestamp">
+							16:24
+						</h5>
+					</div>
+					
+					<div class="chat-info-preview">
+						<span class="chat-last-message">pibe1 ha creado una actividad padel pibes</span>
+						<span class="chat-unread-messages">24</span>
+					</div>
+				</div>
+				
+			</button>
 		</div>
+		<button type="button" class="sidebar-join-chat">
+			Join chat
+		</button>
 	  </div>
+
+
 	  <div class="chat-content">
 		<div class="chat-header">
-		  <div class="chat-info">
-			<h2>Group Chat Name</h2>
-		  </div>
-		  <div class="chat-settings">
-			<button><i class="bi bi-gear-fill"></i></button>
-		  </div>
+			<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="">
+		  	<div class="chat-info">
+				<h2 class="chat-name-current">Group Chat Name</h2>
+		 	</div>
+			<div class="chat-settings">
+				<button><i class="bi bi-gear-fill"></i></button>
+			</div>
 		</div>
 		<div class="chat-messages">
-		  <!-- Chat messages go here -->
+			<div class="chat-message-others">
+				<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="">
+				<div class="chat-message-bubble">
+					<span class="chat-message-bubble-username">
+						pibe35
+					</span>
+					<span class="chat-message">
+						Hola
+					</span>
+				</div>
+			</div>
 		</div>
 		<div class="chat-input">
 			<input type="text" placeholder="Type your message">
-			<button>Send</button>
 		</div>
 	  </div>
 
