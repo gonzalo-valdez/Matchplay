@@ -23,9 +23,37 @@ $(function() {
     });
 });
 
-$(document).ready(function() {
-    
+function loginAjax(username, password){
+    $.ajax({
+    type: "POST",
+    url: "/login",
+    contentType: "application/json",
+    data: JSON.stringify({ username, password }),
+    success: function(data) {
+        const token = data.token;
+        localStorage.setItem("token", token);
+        showMessage("Login successful!");
+        //redirect
+        window.location.href="chat.html";
+    },
+    error: function(err) {
+        const data = err.responseJSON;
+        showMessage(data.message);
+    }
+    });
+}
 
+
+$(document).ready(function() {
+    //if logged in redirect
+    setTimeout(function () {
+        const token = localStorage.getItem('token');
+        if (token !== null) {
+           window.location.href="chat.html"
+        }
+      }, 0);
+     
+    
     const registerForm = $("#register");
     const loginForm = $("#login");
 
@@ -41,6 +69,7 @@ $(document).ready(function() {
         data: JSON.stringify({ username, password1, password2 }),
         success: function(data) {
             showMessage("Registration successful!");
+            loginAjax(username, password1);
         },
         error: function(err) {
             const data = err.responseJSON;
@@ -51,27 +80,8 @@ $(document).ready(function() {
 
     loginForm.on("submit", function(e) {
         e.preventDefault();
-        const username = $("#login-username").val();
-        const password = $("#login-password").val();
-
-        $.ajax({
-        type: "POST",
-        url: "/login",
-        contentType: "application/json",
-        data: JSON.stringify({ username, password }),
-        success: function(data) {
-            const token = data.token;
-            localStorage.setItem("token", token);
-            showMessage("Login successful!");
-            //redirect
-            window.location.href="chat.html";
-        },
-        error: function(err) {
-            const data = err.responseJSON;
-            showMessage(data.message);
-        }
-        });
-    });
+        loginAjax($("#login-username").val(), $("#login-password").val());
+    })
 });
 
 

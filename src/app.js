@@ -1,12 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+
 const app = express();
-
 app.use(bodyParser.json());
-
-app.use(express.static('public'));
-
 const secretKey = 'c578d4aa7e64585eed9ef8ddf54e57f902022eaf4443770e9b29180599e39c9b'
 
 // Replace with your database logic for user management
@@ -33,19 +31,28 @@ function verifyToken(req, res, next) {
     });
   }
 
-app.get('/userProfile', verifyToken, (req, res) => {
-    res.json(req.user);
-});
 
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/chat.html', verifyToken, (req, res) => {
-    // Serve chat.html to authorized users
+//HTML URLS
+
+app.get('/chat.html',verifyToken, (req, res) => {
     res.sendFile(__dirname + '/public/chat.html');
 });
 
 app.get('/index.html', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
+
+
+//GETS 
+
+app.get('/userProfile', verifyToken, (req, res) => {
+    res.json(req.user);
+});
+
+
+//POSTS
 
 app.post('/register', (req, res) => {
     const { username, password1, password2} = req.body;

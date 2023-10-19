@@ -1,10 +1,11 @@
 :root {
-    --primary-color: #161616;
-    --secondary-color: #25292c;
+    --primary-color: #151618;
+    --secondary-color: #22282c;
+    --dropdown-color: rgba(32, 51, 54, 0.6);
     --lighter-color: #424242;
     --border-color: #666;
     --text-color: #ffffff;
-
+    --gray-text-color: #BBB;
 }
 
 body {
@@ -17,8 +18,9 @@ h2 {
     color: var(--text-color);
     font-weight: 500;
 }
+
 .chat-container {
-    background-color: #111111;
+    background-color: #101112;
     display: flex;
     height: 100vh;
 }
@@ -47,8 +49,50 @@ h2 {
     padding-right: 10px;
     padding-left: 10px;
 }
-.user-panel span {
+.user-panel .username {
     padding-left: 5px;
+    user-select: none;
+}
+
+
+.options-menu {
+    max-height: auto;
+    width: auto;
+    display: none;
+    z-index: 20;
+    border:none;
+    position: absolute;
+    background-color: var(--dropdown-color);
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+}
+
+.options-menu button:first-child {
+    border-top-left-radius: 10px; 
+    border-top-right-radius: 10px;
+}
+
+.options-menu button:last-child {
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.options-menu button {
+    text-align: left;
+    background: none;
+    display: block;
+    border: none;
+    width: 100%;
+    color: var(--text-color);
+    padding-left: 30px;
+    padding-right: 70px;
+    transition: all 0.2s;
+    height: 40px;
+    white-space: nowrap;
+}
+
+.options-menu button:hover {
+    background-color: var(--primary-color);
 }
 
 .search-bar input {
@@ -59,6 +103,8 @@ h2 {
     margin-left: 5px;
     border-radius: 10px;
     margin-bottom: 10px;
+    color: var(--text-color);
+    user-select: none;
 }
 
 .chat-list {
@@ -79,6 +125,8 @@ h2 {
     align-items: center;
     padding-left: 20px;
     cursor: pointer;
+    transition: all 0.1s;
+    user-select: none;
 }
 
 .chat-item:hover, .chat-item:focus {
@@ -141,6 +189,7 @@ h2 {
     margin-right: 10px;
     border-radius: 10px;
     cursor: pointer;
+    user-select: none;
 }
 
 
@@ -167,11 +216,13 @@ h2 {
     height: 40px;
     padding-left: 10px;
     background-color: var(--secondary-color);
+    user-select: none;
 }
 .chat-header .chat-image {
     width: 38px;
     height: 38px;
     padding-right: 10px;
+    user-select: none;
 }
 
 .chat-info {
@@ -184,7 +235,7 @@ h2 {
     font-size: 20px;
 }
 
-.chat-settings button, .user-panel button{
+.chat-settings button, #user-panel-options-menu-button {
     margin-left: auto;
     background: none;
     border:none;
@@ -200,11 +251,22 @@ h2 {
 .chat-messages {
     flex: 1;
     overflow-y: auto;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
 .chat-message-others {
     display: flex;
     color: var(--text-color);
+    margin-left: 20px;
+    margin-right: 20px;
+}
+.chat-message-self {
+    display: flex;
+    color: var(--text-color);
+    justify-content: flex-end;
+    margin-right: 20px;
     margin-left: 20px;
 }
 .chat-messages .chat-image {
@@ -212,27 +274,55 @@ h2 {
     height: 30px;
     padding-left: 10px;
     padding-right: 10px;
+    user-select: none;
 }
 
-.chat-message-others .chat-message-bubble {
-    background: var(--secondary-color);
+.chat-message-bubble {
     display: flex;
     flex-direction: column;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 10px;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+    position: relative;
+    max-width: 80%;
+    overflow-wrap: break-word;
 }
+.chat-message-others .chat-message-bubble {
+    background: var(--secondary-color);
+}
+
+.chat-message-self .chat-message-bubble {
+    background: #32574c;
+}
+
 .chat-message-bubble-username {
     font-weight: 700;
     padding-bottom: 5px;
 }
 
+.chat-message-text {
+    align-items: end;
+    margin-bottom: 10px;
+}
+
+.chat-message-timestamp {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    padding-left: 20px;
+    margin: 0;
+    font-weight: 300;
+    color: var(--gray-text-color);
+}
 
 .chat-input {
     display: flex;
     height: 60px;
     align-items: center;
     margin-top: auto;
-    background-color: var(--secondary-color)
+    background-color: var(--secondary-color);
+    user-select: none;
 }
 
 .chat-input input {
