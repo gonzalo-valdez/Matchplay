@@ -34,41 +34,70 @@ $(document).ready(function() {
         
     
   // CHAT MESSAGING
-  
-  /*const socket = new WebSocket("ws://your-websocket-server-url");
 
-  // Handle incoming messages from the WebSocket server
-  socket.onmessage = function(event) {
-    const message = JSON.parse(event.data);
-    chatMessages.append(`<div class="chat-message-others">
-				<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="">
-				<div class="chat-message-bubble">
-					<span class="chat-message-bubble-username">
-						${message.username}
-					</span>
-					<span class="chat-message">
-						${message.text}
-					</span>
-				</div>
-			</div>`);
-  };
+  function getCurrentTime() {
+      const now = new Date();
+      const hours = now.getHours().toString().padStart(2, '0'); // Pad with leading zero if needed
+      const minutes = now.getMinutes().toString().padStart(2, '0'); // Pad with leading zero if needed
+      return `${hours}:${minutes}`;
+  }
+  function addIncomingMessage(sender, message, timestamp) {
+    const messageHtml = `
+    <div class="chat-message-others">
+      <img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+      <div class="chat-message-bubble">
+        <div class="message-data">
+          <span class="chat-message-bubble-username">${sender}</span>
+          <span class="chat-message-text">${message}?</span>
+        </div>
+        <h6 class="chat-message-timestamp">${timestamp}</h6>
+      </div>
+    </div>
+    `;
+    $('#chat-messages').append(messageHtml);
+  }
+  function addSelfMessage(message) {
+    const timestamp = getCurrentTime();
+    const messageHtml =`
+    <div class="chat-message-self">
+      <div class="chat-message-bubble">
+        <div class="message-data">
+          <span class="chat-message-text">${message}</span>
+        </div>
+        <h6 class="chat-message-timestamp">${timestamp}</h6>
+      </div>
+    </div>
+    `;
+    $('#chat-messages').append(messageHtml);
+    rescrollBottom();
+  }
 
-  messageForm.on("submit", function(e) {
-    e.preventDefault();
-    const text = messageInput.val();
-    if (text.trim() !== "") {
-      const message = {
-        text: text,
-      };
-      socket.send(JSON.stringify(message));
-      messageInput.val("");
+  $('#chat-input-box').on('keydown', function(event) {
+    if (event.keyCode === 13) { 
+        event.preventDefault(); 
+        const message = $(this).val(); 
+        if (message.trim() !== '') { 
+            addSelfMessage(message);
+            $(this).val('');
+        }
     }
-  });*/
+  });
+  function rescrollBottom(){
+    var chatMessages = $('#chat-messages');
+    chatMessages.scrollTop(chatMessages[0].scrollHeight);
+  }
 
+
+
+  
   //USER-PANEL OPTIONS MENU
   const logoutButton = $("#logout-button");
   const menuButton = $("#user-panel-options-menu-button");
   const menu = $("#user-panel-options-menu");
+  const openChatSettingsButton = $("#current-chat-settings-button");
+  const closeChatSettingsButton = $("#close-chat-settings-button");
+  const chatSettingsSidebar = $("#current-chat-settings-sidebar");
+  const chatContent = $("#chat-content");
 
   function openMenu() {
       const buttonPosition = menuButton.offset();
@@ -81,11 +110,10 @@ $(document).ready(function() {
   }
   function closeMenu() {
     menu.css("display", "none");
-    overlay.css("display", "none");
   }
 
   menuButton.click(function(e) {
-    e.stopPropagation(); // Prevent the click event from propagating to the document
+    e.stopPropagation(); 
     if(menu.css("display") == "none") {
       openMenu()
     } else {
@@ -93,12 +121,10 @@ $(document).ready(function() {
     }
   });
 
-  // Add a click event listener to the document (body) to close the menu
   $(document).click(function() {
     closeMenu();
   });
 
-  // Prevent clicks inside the menu from closing it
   menu.click(function(e) {
     e.stopPropagation();
   });
@@ -111,6 +137,16 @@ $(document).ready(function() {
     localStorage.removeItem("token");
     window.location.href="/"
   })
+  
+
+  //Open/Close chat settings
+  function toggleChatSettings() {
+    chatSettingsSidebar.css("display", chatSettingsSidebar.css("display") == "none" ? "flex" : "none");
+    chatContent.toggle()
+  }
+  closeChatSettingsButton.click(toggleChatSettings);
+  openChatSettingsButton.click(toggleChatSettings);
+
 });
   
 

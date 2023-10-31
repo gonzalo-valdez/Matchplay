@@ -6,104 +6,136 @@
 	<title>Matchplay</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="chat.css">
-	<script src="chat.js"></script>
+	<link rel="stylesheet" type="text/css" href="./chat.css">
+	<script src="./chat.js"></script>
 </head>
 <body>
 	<div class="chat-container">
 
-	  <div class="chat-sidebar">
+		<div class="chat-sidebar">
 
-		<div class="user-panel">
-			<img class="user-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
-			<span class="username"></span>
-			<button type="button" id="user-panel-options-menu-button"><i class="bi bi-three-dots-vertical"></i></button>
-			<div id="user-panel-options-menu" class="options-menu hide">
-				<button id="new-group-button">
-					New group
-				</button>
-				<button id="user-settings-button">
-					Settings
-				</button>
-				<button id="logout-button">
-					Log out
+			<div class="user-panel">
+				<img class="user-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+				<span class="username"></span>
+				<button type="button" id="user-panel-options-menu-button"><i class="bi bi-three-dots-vertical"></i></button>
+				<div id="user-panel-options-menu" class="options-menu hide">
+					<button id="new-group-button">
+						New group
+					</button>
+					<button id="user-settings-button">
+						Settings
+					</button>
+					<button id="logout-button">
+						Log out
+					</button>
+				</div>
+			</div>
+
+			<div class="search-bar">
+				<input type="text" placeholder="Search chats">
+			</div>
+
+			<div class="chat-list">
+				<button type="button" class="chat-item">
+					<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+					<div class="chat-info">
+						<div class="chat-info-timestamp">
+							<h4 class="chat-name">
+								Padel pibes
+							</h4>
+							<h5 class="chat-timestamp">
+								16:24
+							</h5>
+						</div>
+						
+						<div class="chat-info-preview">
+							<span class="chat-last-message">pibe1 ha creado una actividad padel pibes</span>
+							<span class="chat-unread-messages">24</span>
+						</div>
+					</div>
 				</button>
 			</div>
-		</div>
-
-		<div class="search-bar">
-		  	<input type="text" placeholder="Search chats">
-		</div>
-
-		<div class="chat-list">
-			<button type="button" class="chat-item">
-				<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
-				<div class="chat-info">
-					<div class="chat-info-timestamp">
-						<h4 class="chat-name">
-							Padel pibes
-						</h4>
-						<h5 class="chat-timestamp">
-							16:24
-						</h5>
-					</div>
-					
-					<div class="chat-info-preview">
-						<span class="chat-last-message">pibe1 ha creado una actividad padel pibes</span>
-						<span class="chat-unread-messages">24</span>
-					</div>
-				</div>
+			<button class="sidebar-join-chat">
+				Join chat
 			</button>
 		</div>
-		<button class="sidebar-join-chat">
-			Join chat
-		</button>
-	  </div>
 
 
-	  <div class="chat-content">
-		<div class="chat-header">
-			<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
-		  	<div class="chat-info">
-				<h2 class="chat-name-current">Padel pibes</h2>
-		 	</div>
-			<div class="chat-settings">
-				<button><i class="bi bi-gear-fill"></i></button>
+		<div id="chat-content">
+			<div class="chat-header">
+				<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+				<div class="chat-info">
+					<h2 class="chat-name-current">Padel pibes</h2>
+				</div>
+				<div class="chat-settings">
+					<button id="current-chat-settings-button"><i class="bi bi-gear-fill"></i></button>
+				</div>
+			</div>
+			<div class="chat-messages" id="chat-messages">
+				<div class="chat-message-others">
+					<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+					<div class="chat-message-bubble">
+						<div class="message-data">
+							<span class="chat-message-bubble-username">pibe35</span>
+							<span class="chat-message-text">Hola cuando jugamos?</span>
+						</div>
+						<h6 class="chat-message-timestamp">15:24</h6>
+					</div>
+				</div>
+				
+				<div class="chat-message-self">
+					<div class="chat-message-bubble">
+						<div class="message-data">
+							<span class="chat-message-text">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
+						</div>
+						<h6 class="chat-message-timestamp">15:24</h6>
+					</div>
+				</div>
+				<div class="chat-message-self">
+					<div class="chat-message-bubble">
+						<div class="message-data">
+							<span class="chat-message-text">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</span>
+						</div>
+						<h6 class="chat-message-timestamp">15:24</h6>
+					</div>
+				</div>
+				
+			</div>
+			<div class="chat-input">
+				<input id="chat-input-box" type="text" placeholder="Type your message">
 			</div>
 		</div>
-		<div class="chat-messages">
-			<div class="chat-message-others">
-				<img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
-				<div class="chat-message-bubble">
-					<span class="chat-message-bubble-username">
-						pibe35
-					</span>
-					<span class="chat-message-text">
-						Hola cuando jugamos?
-					</span>
-					<h6 class="chat-message-timestamp">
-						15:24
-					</h6>
-				</div>
+
+
+
+		
+		<div id="current-chat-settings-sidebar">
+			<div class="chat-header">
+				<h4 class="chat-settings-sidebar-title">Chat Info</h4>
+				<button id="close-chat-settings-button"><i class="bi bi-x-circle-fill"></i></button>
 			</div>
 			
-			<div class="chat-message-self">
-				<div class="chat-message-bubble">
-					<span class="chat-message-text">
-						Hola, no se cuando jugaremos todaviaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.
-					</span>
-					<h6 class="chat-message-timestamp">
-						15:24
-					</h6>
+			<h2 class="chat-settings-name-current">Padel Pibes</h2>
+			<img class="chat-settings-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+			<h2 class="chat-settings-description-title">
+				Description
+			</h2>
+			<p class="chat-settings-description">
+				Grupo para quedar para padel
+			</p>
+			<div class="chat-settings-members-container">
+				<h2 class="chat-members-title">Chat members</h2>
+				<div class="chat-settings-members-list">
+					<div class="chat-member">
+						<h4 class="chat-member-username">pibe1</h4>
+					</div>
 				</div>
 			</div>
+		</div>
 
-		</div>
-		<div class="chat-input">
-			<input type="text" placeholder="Type your message">
-		</div>
-	  </div>
+
+
 
 	</div>
-  </body>
+</body>
 </html>

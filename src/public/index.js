@@ -34,7 +34,7 @@ function loginAjax(username, password){
         localStorage.setItem("token", token);
         showMessage("Login successful!");
         //redirect
-        window.location.href="chat.html";
+        window.location.href= "/chat"
     },
     error: function(err) {
         const data = err.responseJSON;
@@ -49,7 +49,7 @@ $(document).ready(function() {
     setTimeout(function () {
         const token = localStorage.getItem('token');
         if (token !== null) {
-           window.location.href="chat.html"
+           window.location.href="chat"
         }
       }, 0);
      

@@ -13,7 +13,7 @@ const users = [{username: "gonzalo", password: "123"}];
 function verifyToken(req, res, next) {
     const token = req.headers.authorization;
     if (!token) {
-      // Return a JSON error response with a redirection URL if the token is missing
+        // Return a JSON error response with a redirection URL if the token is missing
       return res.status(401).json({ message: 'Authentication required', redirect: '/index.html' });
     }
     
@@ -31,12 +31,10 @@ function verifyToken(req, res, next) {
     });
   }
 
-
 app.use(express.static(path.join(__dirname, 'public')));
-
 //HTML URLS
 
-app.get('/chat.html',verifyToken, (req, res) => {
+app.get('/chat', (req, res) => {
     res.sendFile(__dirname + '/public/chat.html');
 });
 
