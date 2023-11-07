@@ -1,38 +1,6 @@
 $(document).ready(function() {
-  const token = localStorage.getItem('token');
-  let userData;
-  fetch('/userProfile', {
-      method: 'GET',
-      headers: {
-        'Authorization': token,
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(response => {
-      if (response.status === 200) {
-        return response.json(); // Parse the response as JSON
-      } else {
-        return response.json().then(data => {
-          if (data.redirect) {
-            // Redirect to the URL specified in the JSON response
-            window.location.href = data.redirect;
-          } else {
-            console.error('Error:', data.message);
-          }
-        });
-      }
-    })
-    .then(data => {
-      userData = data;
-      //load all data
-      $('.username').html(userData.username);
-      
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-        
-    
+  
+
   // CHAT MESSAGING
 
   function getCurrentTime() {
@@ -93,41 +61,50 @@ $(document).ready(function() {
   //USER-PANEL OPTIONS MENU
   const logoutButton = $("#logout-button");
   const menuButton = $("#user-panel-options-menu-button");
-  const menu = $("#user-panel-options-menu");
+  const userMenu = $("#user-panel-options-menu");
   const openChatSettingsButton = $("#current-chat-settings-button");
   const closeChatSettingsButton = $("#close-chat-settings-button");
   const chatSettingsSidebar = $("#current-chat-settings-sidebar");
   const chatContent = $("#chat-content");
-
+  const overlay = $("#screen-blur-overlay");
   function openMenu() {
       const buttonPosition = menuButton.offset();
-      menu.css({
+      userMenu.css({
           display: "block",
           top: buttonPosition.top + menuButton.outerHeight(),
-          left: buttonPosition.left - menu.outerWidth() + menuButton.outerWidth(),
+          left: buttonPosition.left - userMenu.outerWidth() + menuButton.outerWidth(),
       });
       
   }
   function closeMenu() {
-    menu.css("display", "none");
+    userMenu.css("display", "none");
   }
 
   menuButton.click(function(e) {
     e.stopPropagation(); 
-    if(menu.css("display") == "none") {
+    if(userMenu.css("display") == "none") {
       openMenu()
     } else {
       closeMenu()
     }
   });
-
-  $(document).click(function() {
-    closeMenu();
-  });
-
-  menu.click(function(e) {
+  userMenu.click(function(e) {
     e.stopPropagation();
   });
+
+  $(document).click(function() {
+    //hiding popups
+    closeMenu();
+
+    
+    if(joinChatPopup.is(":visible")){
+      rotateJoinChatButton();
+      joinChatPopup.hide();
+      overlay.toggle();
+    }
+  });
+
+  
 
 
   //Log out button
@@ -139,6 +116,36 @@ $(document).ready(function() {
   })
   
 
+  //Join-Create chat popup
+  const joinChatPopup = $("#popup-join-create-chat");
+  const openJoinButton = $("#sidebar-join-chat-button");
+  let rot = 0;
+  function rotateJoinChatButton(){
+    rot = rot + 45;
+    if(rot==90) rot = 0;
+    openJoinButton.css({
+      'transform': `rotate(${rot}deg)`
+    })
+  }
+  openJoinButton.click(function(e) {
+    e.stopPropagation();
+    overlay.toggle();
+    rotateJoinChatButton()
+    joinChatPopup.toggle();
+  })
+
+  const joinChatTab = $("#popup-join-chat-tab");
+
+
+
+
+
+
+
+
+
+
+
   //Open/Close chat settings
   function toggleChatSettings() {
     chatSettingsSidebar.css("display", chatSettingsSidebar.css("display") == "none" ? "flex" : "none");
@@ -147,6 +154,44 @@ $(document).ready(function() {
   closeChatSettingsButton.click(toggleChatSettings);
   openChatSettingsButton.click(toggleChatSettings);
 
+
+
+
+    /* SERVER COMMS CODE 
+  const token = localStorage.getItem('token');
+  let userData;
+  fetch('/userProfile', {
+      method: 'GET',
+      headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      if (response.status === 200) {
+        return response.json(); // Parse the response as JSON
+      } else {
+        return response.json().then(data => {
+          if (data.redirect) {
+            // Redirect to the URL specified in the JSON response
+            window.location.href = data.redirect;
+          } else {
+            console.error('Error:', data.message);
+          }
+        });
+      }
+    })
+    .then(data => {
+      userData = data;
+      //load all data
+      $('.username').html(userData.username);
+      
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+        
+    */
 });
   
 

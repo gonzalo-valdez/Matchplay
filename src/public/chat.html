@@ -10,6 +10,7 @@
 	<script src="./chat.js"></script>
 </head>
 <body>
+	<div id="screen-blur-overlay"></div>
 	<div class="chat-container">
 
 		<div class="chat-sidebar">
@@ -54,12 +55,38 @@
 						</div>
 					</div>
 				</button>
+				
 			</div>
-			<button class="sidebar-join-chat">
-				Join chat
+			<button id="sidebar-join-chat-button">
+				+
 			</button>
 		</div>
-
+		
+		<div id="popup-join-create-chat" style="display:none">
+			<div class="popup-join-create-top">
+				<button id="join-chat-tab-button">Join</button>
+				<button id="create-chat-tab-button">Create</button>
+			</div>
+			<div id="popup-join-chat-tab">
+				<div class="chatid-input">
+					<label>Chat ID</label>
+					<input type="text" id="popup-join-chatid" placeholder="Type Chat ID here">	
+				</div>
+				<button id="join-chat-button">
+					Join
+				</button>
+			</div>
+			<div id="popup-create-chat-tab" style="display:none">
+				<div class="chatid-input">
+					<label>Chat Name</label>
+					<input type="text" id="popup-join-chatid" placeholder="Type Chat Name here">	
+				</div>
+				<button id="create-chat-button">
+					Create
+				</button>
+			</div>
+		</div>
+		
 
 		<div id="chat-content">
 			<div class="chat-header">

@@ -1,7 +1,7 @@
 :root {
     --primary-color: #151618;
     --secondary-color: #22282c;
-    --dropdown-color: rgba(32, 51, 54, 0.6);
+    --dropdown-color: rgba(32, 51, 54, 0.7);
     --lighter-color: #424242;
     --border-color: #666;
     --text-color: #ffffff;
@@ -19,8 +19,18 @@ h2 {
     font-weight: 500;
 }
 
-h2, h3, h4, p {
+h2, h3, h4, p, button, label {
     color: var(--text-color);
+}
+
+#screen-blur-overlay {
+    display:none;
+    position: absolute;
+    background: rgba(40,40,40, 0.7);
+    backdrop-filter: blur(2px);
+    width: 100%;
+    height: 100%;
+    z-index: 2;
 }
 
 .chat-container {
@@ -182,18 +192,26 @@ h2, h3, h4, p {
     text-align: center;
 }
 
-.sidebar-join-chat {
+
+#sidebar-join-chat-button {
+    width: 40px;
+    height: 40px;
+    align-self: center;
     color: var(--text-color);
     background-color: var(--self-color);
     border: none;
-    padding: 10px 0px;
+    padding: 0px;
     margin-top: auto;
     margin-bottom: 15px;
     margin-left: 10px;
     margin-right: 10px;
-    border-radius: 10px;
+    border-radius: 50%;
     cursor: pointer;
     user-select: none;
+    font-size: 30px;
+    font-weight: 500;
+    transition: 0.5s all;
+    z-index: 20;
 }
 
 
@@ -432,3 +450,88 @@ i {
     margin: 0;
 }
 
+
+
+
+
+/* POP UPS */
+
+#popup-join-create-chat {
+    position: absolute;
+    width: 300px;
+    height: 200px;
+    background: var(--dropdown-color);
+    border-radius: 20px;
+    border-top-right-radius: 0;
+    z-index: 20;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+
+    align-self: center;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.popup-join-create-top {
+    display: flex;
+    justify-content: center;
+}
+
+#close-join-create-chat {
+    position: absolute;
+    background: none;
+    border: none;
+    right: 3px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+#close-join-create-chat i {
+    font-size: 15px;
+}
+
+#join-chat-tab-button, #create-chat-tab-button {
+    background: var(--lighter-color);
+    border: none;
+    cursor: pointer;
+    border-radius:5px;
+    margin: 5px;
+}
+
+#join-chat-tab-button:hover, #create-chat-tab-button:hover {
+    background: var(--self-color);
+    border: none;
+    cursor: pointer;
+}
+
+#popup-join-chat-tab, #popup-create-chat-tab {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 50px;
+}
+
+.chatid-input input {
+    background-color: var(--lighter-color);
+    padding: 5px 0 5px 10px;
+    border: none;
+    margin-left: 5px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: var(--text-color);
+    user-select: none;
+}
+
+#join-chat-button, #create-chat-button {
+    position: absolute;
+    bottom: 10px;
+    background: var(--lighter-color);
+    border: none;
+    border-radius: 5px;
+    padding: 5px 20px;
+    cursor: pointer;
+}
