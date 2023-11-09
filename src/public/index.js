@@ -49,7 +49,7 @@ $(document).ready(function() {
     setTimeout(function () {
         const token = localStorage.getItem('token');
         if (token !== null) {
-           window.location.href="chat"
+           window.location.href="/chat"
         }
       }, 0);
      
@@ -62,6 +62,8 @@ $(document).ready(function() {
         const username = $("#register-username").val();
         const password1 = $("#register-password1").val();
         const password2 = $("#register-password2").val();
+        window.location.href= "./chat.html"
+        /*
         $.ajax({
         type: "POST",
         url: "/register",
@@ -75,12 +77,13 @@ $(document).ready(function() {
             const data = err.responseJSON;
             showMessage(data.message);
         }
-        });
+        });*/
     });
 
     loginForm.on("submit", function(e) {
         e.preventDefault();
-        loginAjax($("#login-username").val(), $("#login-password").val());
+        window.location.href= "./chat.html"
+        //loginAjax($("#login-username").val(), $("#login-password").val());
     })
 });
 
