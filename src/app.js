@@ -1,93 +1,103 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-const path = require('path');
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
+var bodyParser = require('body-parser');
+var jwt = require('jsonwebtoken');
+var cookie = require('cookie-parser');
 
-const app = express();
+var indexRouter = require('./routes/index');
+var chatRouter = require('./routes/chat');
+
+var app = express();
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', indexRouter);
+app.use('/chat', verifyToken, chatRouter);
+
+app.locals.title = "Matchplay"
+
+
+
 app.use(bodyParser.json());
-const secretKey = 'c578d4aa7e64585eed9ef8ddf54e57f902022eaf4443770e9b29180599e39c9b'
+const key = 'c578d4aa7e64585eed9ef8ddf54e57f902022eaf4443770e9b29180599e39c9b'
 
 // Replace with your database logic for user management
 const users = [{username: "gonzalo", password: "123"}];
 
+
 function verifyToken(req, res, next) {
-    const token = req.headers.authorization;
+    const token = req.cookies.token
     if (!token) {
         // Return a JSON error response with a redirection URL if the token is missing
-      return res.status(401).json({ message: 'Authentication required', redirect: '/index.html' });
+      return res.redirect("/");
     }
     
-    jwt.verify(token, secretKey, (err, decoded) => {
+    jwt.verify(token, key, (err, decoded) => {
       if (err) {
         // Return a JSON error response with a redirection URL if the token is invalid
-        return res.status(401).json({ message: 'Invalid token', redirect: '/index.html' });
+        return res.redirect("/");
       }
         if(!users.find((u) => u.username === decoded.username)){
-            return res.status(401).json({ message: 'Invalid token', redirect: '/index.html' });
+          return res.redirect("/");
         }
       // If the token is valid, you can store the user information in the request object
-      req.user = decoded;
+      res.userData = {username: decoded.username};
       next();
     });
   }
 
-app.use(express.static(path.join(__dirname, 'public')));
-//HTML URLS
-
-app.get('/chat', (req, res) => {
-    res.sendFile(__dirname + '/public/chat.html');
-});
-
-app.get('/index.html', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
-});
 
 
-//GETS 
-
-app.get('/userProfile', verifyToken, (req, res) => {
-    res.json(req.user);
-});
 
 
-//POSTS
 
 app.post('/register', (req, res) => {
-    const { username, password1, password2} = req.body;
-    // Add user to your database (for simplicity, users are stored in memory)
-    if(username.replace(/ /g, '') == "") {
-        res.status(401).json({ message: 'Please enter a valid username' });
-        return;
-    }
-    if(password1 != password2) {
-        res.status(401).json({message: "The passwords do not match"});
-        return;
-    }
-    if (users.find((u) => u.username === username)) {
-        res.status(401).json({ message: 'Username already in use' });
-    }
-    users.push({ username: username, password: password1 });
-    res.json({ message: 'User registered successfully' });
+  const { username, password1, password2} = req.body;
+
+  if(username.replace(/ /g, '') == "") {
+      res.status(401).json({ message: 'Please enter a valid username' });
+      return;
+  }
+  if(password1 != password2) {
+      res.status(401).json({message: "The passwords do not match"});
+      return;
+  }
+  if (users.find((u) => u.username === username)) {
+      res.status(401).json({ message: 'Username already in use' });
+  }
+  users.push({ username: username, password: password1 });
+  res.json({ message: 'User registered successfully' });
 });
 
 app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-    // Check if the user exists in your database
-    const user = users.find((u) => u.username === username && u.password === password);
-    if (user) {
-        // Create a JWT token and send it as a response
-        const token = jwt.sign({ username }, secretKey);
-        res.json({token });
-    } else {
-        res.status(401).json({ message: 'Authentication failed' });
-    }
+  const { username, password } = req.body;
+  const user = users.find((u) => u.username === username && u.password === password);
+  if (user) {
+      // Create a JWT token
+      const token = jwt.sign({ username }, key);
+      res.cookie('token', token, {httpOnly: true});
+      res.json({ success: true, message: 'Authentication successful' });
+  } else {
+      res.status(401).json({ message: 'Authentication failed' });
+  }
+});
+
+app.post("/logout", (req, res) => {
+  //Clear Cookies
+  res.clearCookie('token');
+  res.json({ message: 'Logout successful' });
 });
 
 
-
-
-//
-const port = 3000;
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
+module.exports = app;

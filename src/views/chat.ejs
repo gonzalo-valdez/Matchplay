@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title><%=title%></title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="/stylesheets/chat.css">
+	<script src="/javascripts/chat.js"></script>
+</head>
+<body>
+	<div id="screen-blur-overlay"></div>
+	<div class="chat-container" id="chat-container">
+
+		<div class="chat-sidebar">
+			<div class="user-panel">
+				<img class="user-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+				<span class="username"><%=username%></span>
+				<button type="button" id="user-panel-options-menu-button"><i class="bi bi-three-dots-vertical"></i></button>
+				<div id="user-panel-options-menu" class="options-menu hide">
+					<button id="user-settings-button">
+						Settings
+					</button>
+					<button id="logout-button">
+						Log out
+					</button>
+				</div>
+			</div>
+
+			<div class="search-bar">
+				<input type="text" placeholder="Search chats">
+			</div>
+
+			<div class="chat-list" id="chat-list">
+				
+				
+			</div>
+			<button id="sidebar-join-chat-button">
+				+
+			</button>
+		</div>
+		
+		<div id="popup-join-create-chat" style="display:none">
+			<div class="popup-join-create-top">
+				<button id="join-chat-tab-button">Join</button>
+				<button id="create-chat-tab-button">Create</button>
+			</div>
+			<div id="popup-join-chat-tab">
+				<div class="chatid-input">
+					<label>Chat Invite ID</label>
+					<input type="text" id="popup-join-chatid" placeholder="Type Chat Invite ID here">	
+				</div>
+				<button id="join-chat-button">
+					Join
+				</button>
+			</div>
+			<div id="popup-create-chat-tab" style="display:none">
+				<div class="chatid-input">
+					<label>Chat Name</label>
+					<input type="text" id="popup-create-chatname" placeholder="Type Chat Name here">	
+				</div>
+				<button id="create-chat-button">
+					Create
+				</button>
+			</div>
+		</div>
+		
+
+
+
+	</div>
+</body>
+</html>
