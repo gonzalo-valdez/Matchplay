@@ -33,29 +33,29 @@ app.use(bodyParser.json());
 const key = 'c578d4aa7e64585eed9ef8ddf54e57f902022eaf4443770e9b29180599e39c9b'
 
 // Replace with your database logic for user management
-const users = [{username: "gonzalo", password: "123"}];
+let users = [{username: "gonzalo", password: "123"}];
 
 
 function verifyToken(req, res, next) {
-    const token = req.cookies.token
-    if (!token) {
-        // Return a JSON error response with a redirection URL if the token is missing
+  const token = req.cookies.token
+  if (!token) {
+      // Return a JSON error response with a redirection URL if the token is missing
+    return res.redirect("/");
+  }
+  
+  jwt.verify(token, key, (err, decoded) => {
+    if (err) {
+      // Return a JSON error response with a redirection URL if the token is invalid
       return res.redirect("/");
     }
-    
-    jwt.verify(token, key, (err, decoded) => {
-      if (err) {
-        // Return a JSON error response with a redirection URL if the token is invalid
+      if(!users.find((u) => u.username === decoded.username)){
         return res.redirect("/");
       }
-        if(!users.find((u) => u.username === decoded.username)){
-          return res.redirect("/");
-        }
-      // If the token is valid, you can store the user information in the request object
-      res.userData = {username: decoded.username};
-      next();
-    });
-  }
+    // If the token is valid, you can store the user information in the request object
+    res.userData = {username: decoded.username};
+    next();
+  });
+}
 
 
 
@@ -92,6 +92,9 @@ app.post('/login', (req, res) => {
       res.status(401).json({ message: 'Authentication failed' });
   }
 });
+
+
+
 
 app.post("/logout", (req, res) => {
   //Clear Cookies

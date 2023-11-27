@@ -168,7 +168,7 @@ $(document).ready(function() {
   let uid = 0
   function generateChatData(name) {
     uid = uid + 1;
-    data = {'uid': uid, 'chatName': name};
+    data = {'uid': uid, 'chatName': name, 'description': "", 'members': ''};
     chatList.push(data);
     return data;
   }
@@ -258,6 +258,7 @@ $(document).ready(function() {
           }
       }
     });
+
     chatData['loaded'] = true;
     chatData['container'] = containerDiv;
     chatData['chatContent'] = chatHtml;

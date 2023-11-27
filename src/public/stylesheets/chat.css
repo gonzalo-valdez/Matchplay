@@ -402,7 +402,7 @@ i {
     flex: 1;
     padding: 0 0 0 0;
     background: none;
-    display: none;
+    display: flex;
     flex-direction: column;
     max-height: 100%;
 }
@@ -442,6 +442,15 @@ i {
     margin-right: 10px;
     max-height: 100px;
     overflow-y: auto;
+}
+
+.edit-description-button {
+    margin-left: auto;
+    background: none;
+    border:none;
+    border-left: 2px solid var(--border-color);
+    cursor: pointer;
+    padding: 8px;
 }
 
 .chat-settings-image {
