@@ -26,6 +26,12 @@ img {
     user-select: none;
 }
 
+button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
 input:hover {
     outline: 2px solid var(--self-color);
 }
@@ -425,6 +431,11 @@ i {
     cursor: pointer;
     padding: 8px;
 }
+
+.close-chat-settings-button i {
+    font-size: 20px;
+}
+
 .chat-settings-sidebar-info {
     display: flex;
     flex-direction: column;
@@ -473,13 +484,48 @@ i {
     overflow-y: auto;
 }
 
-.chat-member h4 {
+.chat-member {
+    display: flex;
+    align-items: center;
     background-color: var(--primary-color);
-    padding: 10px 5px;
+    padding: 0px 5px;
+    height: 40px;
+    justify-content: space-between;
 }
 
+.chat-member-username {
+    margin-right: 10px;
+}
 
+.chat-member-adminrank {
+    color: #909090;
+    font-style: italic;
+}
 
+.promote-member-button {
+    margin-left: auto;
+    border-radius: 20px;
+    height: 40px;
+}
+
+.promote-member-button i {
+    font-size: 20px;
+    color: rgb(26, 216, 121);
+}
+
+.kick-member-button {
+    border-radius: 20px;
+    justify-content: flex-end;
+    height: 40px;
+}
+.kick-member-button i {
+    font-size: 18px;
+    color: #FF0000
+}
+.promote-member-button:hover, .kick-member-button:hover {
+    transition: 0.2s all;
+    background-color: var(--lighter-color);
+}
 
 
 /* POP UPS */

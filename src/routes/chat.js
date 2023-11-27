@@ -19,51 +19,20 @@ function generateChatData(username, chatName) {
   return data;
 }
 
-function verifyAdmin(username, chatid) {
-  chatData.find((chat) => {
-    if(chat.uid == chatid && chat.admins.find((u) => username == u)){
-      return true
-    }
-  })
-  return false
-}
-
-function verifyFounder(username, chatid) {
-  chatData.find((chat) => {
-    if(chat.uid == chatid && chat.founder == username){
-      return true
-    }
-  })
-  return false
-}
-
-function verifyMember(username, chatid) {
-  chatData.find((chat) => {
-    if(chat.uid == chatid && chat.members.find((u) => username == u)){
-      return true
-    }
-  })
-  return false
-}
-
 function promoteMember(adminUser, memberUser, chatid) {
-  if(verifyFounder(adminUser) && verifyMember(memberUser)) {
-    chatData.find((chat) => {
-      if(chat.uid == chatid) {
-        chat.admins.append(memberUser)
-      }
-    })
-  }
+  chatData.find((chat) => {
+    if(chat.uid == chatid && chat.admins.includes(adminUser) && chat.members.includes(memberUser)) {
+      chat.admins.append(memberUser)
+    }
+  })
 }
 
 function kickMember(adminUser, memberUser, chatid) {
-  if(verifyAdmin(adminUser) && verifyMember(memberUser)) {
-    chatData.find((chat) => {
-      if(chat.uid == chatid) {
-        chat.members.splice(chat.members.indexOf(memberUser), 1)
-      }
-    })
-  }
+  chatData.find((chat) => {
+    if(chat.uid == chatid && chat.admins.includes(adminUser) && chat.members.includes(memberUser) && chat.founder != memberUser) {
+      chat.members.splice(chat.members.indexOf(memberUser), 1)
+    }
+  })
 }
 
 function addMember(username, chatid) {

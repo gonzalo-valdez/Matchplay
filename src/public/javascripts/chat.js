@@ -104,7 +104,7 @@ $(document).ready(function() {
 
   logoutButton.click(function(e) {
     e.stopPropagation()
-    fetch('/logout', {
+    fetch('/login/logout', {
       method: 'POST',
       credentials: 'include',
     })
@@ -213,28 +213,33 @@ $(document).ready(function() {
 
     let chatSettingsHtml = $(`
     <div class="current-chat-settings-sidebar">
-      <div class="chat-header">
-        <h4 class="chat-settings-sidebar-title">Chat Info</h4>
-        <button class="close-chat-settings-button"><i class="bi bi-x-circle-fill"></i></button>
-      </div>
-      
-      <h2 class="chat-settings-name-current">${chatData.chatName}</h2>
-      <img class="chat-settings-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
-      <h2 class="chat-settings-description-title">
-        Description
-      </h2>
-      <p class="chat-settings-description">
-        Grupo para quedar para padel
-      </p>
-      <div class="chat-settings-members-container">
-        <h2 class="chat-members-title">Chat members</h2>
-        <div class="chat-settings-members-list">
-          <div class="chat-member">
-            <h4 class="chat-member-username">pibe1</h4>
-          </div>
-        </div>
-      </div>
-    </div>`)
+			<div class="chat-header">
+			  <h4 class="chat-settings-sidebar-title">Chat Info</h4>
+			  <button class="close-chat-settings-button"><i class="bi bi-x-circle-fill"></i></button>
+			</div>
+			
+			<h2 class="chat-settings-name-current">${chatData.chatName}</h2>
+			<img class="chat-settings-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+			<h2 class="chat-settings-description-title">
+			  Description
+			  <button class="edit-description-button"><i class="bi bi-pencil-fill"></i></button>
+			</h2>
+			<p class="chat-settings-description">
+				Grupo para quedar para padel
+			</p>
+			<div class="chat-settings-members-container">
+			  <h2 class="chat-members-title">Chat members</h2>
+			  <div class="chat-settings-members-list">
+				<div class="chat-member">
+				  <h4 class="chat-member-username">pibe1</h4>
+				  <p class="chat-member-adminrank">Founder</p>
+				  <button class="promote-member-button"><i class="bi bi-chevron-double-up"></i></button>
+				  <button class="kick-member-button"><i class="bi bi-x-circle"></i></button>
+				</div>
+			  </div>
+			</div>
+		  </div>
+    `)
 
     //Open/Close chat settings
     let openChatSettingsButton = chatHtml.find(".current-chat-settings-button");

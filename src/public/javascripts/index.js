@@ -55,7 +55,7 @@ $(document).ready(function() {
         const password2 = $("#register-password2").val();
         $.ajax({
         type: "POST",
-        url: "/register",
+        url: "/login/register",
         contentType: "application/json",
         data: JSON.stringify({ username, password1, password2 }),
         success: function(data) {
