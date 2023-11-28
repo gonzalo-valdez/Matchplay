@@ -3,11 +3,11 @@ let users = []
 const { Snowflake } = require('nodejs-snowflake');
 var jwt = require('jsonwebtoken');
 
-let userdatabase = []
+let userdatabase = [{uid: 1, username: 'a', password: 'a'}]
 
 
 const key = 'c578d4aa7e64585emd9ef8ddf54e57f9020j2eaf4443770e9b29180599e39c9b'
-users.verifyToken = function(req, res, next) {
+users.verifyTokenRouter = function(req, res, next) {
   const token = req.cookies.token
   if (!token) {
     return res.redirect("/");
@@ -25,25 +25,34 @@ users.verifyToken = function(req, res, next) {
   });
 }
 
+users.verifyToken = function(token) {
+    return jwt.verify(token, key, (err, decodedData) => {
+        if (err || !users.getUserFromId(decodedData.uid)) {
+           return false
+        }
+
+        return users.getUserFromId(decodedData.uid)
+    })
+}
+
 users.signToken = function(data){
     return jwt.sign(data, key);
 }
 
 users.newUser = function(username, password){
     let uid = new Snowflake();
-    let data = {'uid': uid.getUniqueID(), 'username': username, 'password': password} //replace with hash
+    let data = {'uid': uid.getUniqueID().toString(), 'username': username, 'password': password} //replace with hash
     userdatabase.push(data)
     return data
 }
 
 
 users.getUserFromId = function(uid){
-    userdatabase.find((userData) => {
+    return userdatabase.find((userData) => {
         if(userData.uid == uid){
             return userData
         }
     })
-    return false
 }
 
 users.getUserFromUsername = function(username) {

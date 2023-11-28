@@ -1,3 +1,9 @@
+const socket = io();
+
+socket.on("connect", () => {
+
+})
+
 $(document).ready(function() {
   
 
@@ -23,7 +29,7 @@ $(document).ready(function() {
       </div>
     </div>
     `;
-    currentChat.chatContent.find(".chat-messages").append(messageHtml);
+    chatMessages.append(messageHtml);
   }
   function addSelfMessage(message) {
     let chatMessages = currentChat.chatContent.find(".chat-messages");
@@ -165,13 +171,6 @@ $(document).ready(function() {
   function getChatData(uid) {
     return chatList.find((e) => e.uid == uid)
   }
-  let uid = 0
-  function generateChatData(name) {
-    uid = uid + 1;
-    data = {'uid': uid, 'chatName': name, 'description': "", 'members': ''};
-    chatList.push(data);
-    return data;
-  }
 
   function hideChats(){
     for(chat of chatList){
@@ -273,8 +272,7 @@ $(document).ready(function() {
     chatContainer.append(containerDiv);
   }
 
-  function createChat(name) {
-    let chatData = generateChatData(name);
+  function createChat(chatData) {
     const chatListHTML = $("#chat-list");
     let chatItem = $(`
     <button type="button" class="chat-list-item">
@@ -295,7 +293,6 @@ $(document).ready(function() {
         </div>
       </div>
     </button>`)
-
 
     chatListHTML.append(chatItem);
     chatItem.click(function(e){

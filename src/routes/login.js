@@ -3,7 +3,6 @@ var router = express.Router();
 var jwt = require('jsonwebtoken');
 var database = require('../database')
 
-database.users.newUser("a","a")
 
 
 router.post('/register', (req, res) => {
@@ -27,11 +26,11 @@ router.post('/register', (req, res) => {
 router.post('/', (req, res) => { //login
     const { username, password } = req.body;
     let userData = database.users.getUserFromUsername(username);
-    console.log(userData)
      //replace with hash check
-    if (userData.password == password) {
+    if (userData && userData.password == password) {
         // Create a JWT token
-        const token = database.users.signToken({'username': username})
+        console.log(userData.uid)
+        const token = database.users.signToken({'uid': userData.uid.toString(), 'username': userData.username})
         res.cookie('token', token, {httpOnly: true});
         res.json({ success: true, message: 'Authentication successful' });
     } else {
