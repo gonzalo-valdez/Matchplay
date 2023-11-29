@@ -1,22 +1,27 @@
 const socket = io();
-
-socket.on("connect", () => {
-
-})
-
 $(document).ready(function() {
   
 
-  // CHAT MESSAGING
+  socket.on("load chat", (chatData) => {
+    console.log(chatData)
+    createChat(chatData)
+  })
+  socket.on("receive message", (messageData, chatId) => {
+    addIncomingMessage(messageData.username, messageData.message, messageData.timestamp, chatId)
+  })
 
   function getCurrentTime() {
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, '0'); // Pad with leading zero if needed
-      const minutes = now.getMinutes().toString().padStart(2, '0'); // Pad with leading zero if needed
-      return `${hours}:${minutes}`;
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0'); // Pad with leading zero if needed
+    const minutes = now.getMinutes().toString().padStart(2, '0'); // Pad with leading zero if needed
+    return `${hours}:${minutes}`;
   }
-  function addIncomingMessage(sender, message, timestamp) {
-    let chatMessages = currentChat.chatContent.find(".chat-messages");
+
+  // CHAT MESSAGING
+
+  
+  function addIncomingMessage(sender, message, timestamp, chatId) {
+    let chatMessages = getChatData(chatId).chatContent.find(".chat-messages");
     const messageHtml = `
     <div class="chat-message-others">
       <img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
@@ -50,11 +55,6 @@ $(document).ready(function() {
 
 
   
-
-
-
- 
-
 
 
 
@@ -94,13 +94,6 @@ $(document).ready(function() {
   $(document).click(function() {
     //hiding popups
     closeMenu();
-
-    
-    if(joinChatPopup.is(":visible")){
-      rotateJoinChatButton();
-      joinChatPopup.hide();
-      overlay.toggle();
-    }
   });
 
   
@@ -257,7 +250,8 @@ $(document).ready(function() {
           event.preventDefault(); 
           const message = $(this).val(); 
           if (message.trim() !== '') { 
-              addSelfMessage(message);
+              socket.emit("send message", message, chatData.uid)
+              addSelfMessage(message)
               $(this).val('');
           }
       }
@@ -273,7 +267,11 @@ $(document).ready(function() {
   }
 
   function createChat(chatData) {
+    chatList.push(chatData)
     const chatListHTML = $("#chat-list");
+    let lastMessageData = chatData.messages[chatData.messages.length - 1]
+    let lastMessage = lastMessageData ? `${lastMessageData.username}: ${lastMessageData.message}` : ""
+    let lastMessageTimestamp = lastMessageData ? lastMessageData.timestamp : ""
     let chatItem = $(`
     <button type="button" class="chat-list-item">
       <img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
@@ -283,12 +281,12 @@ $(document).ready(function() {
             ${chatData.chatName}
           </h4>
           <h5 class="chat-timestamp">
-            16:24
+            ${lastMessageTimestamp}
           </h5>
         </div>
-        
+
         <div class="chat-info-preview">
-          <span class="chat-last-message">pibe1 ha creado una actividad padel pibes</span>
+          <span class="chat-last-message">${lastMessage}</span>
           <span class="chat-unread-messages">24</span>
         </div>
       </div>
@@ -309,7 +307,7 @@ $(document).ready(function() {
     e.stopPropagation();
     const chatNameInput = $("#popup-create-chatname");
     toggleJoinCreatePopup();
-    createChat(chatNameInput.val());
+    socket.emit("create chat", chatNameInput.val())
   })
 
 });
