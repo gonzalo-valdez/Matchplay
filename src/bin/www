@@ -20,7 +20,7 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-var chatModule = require('../chatModule')
+var chatModule = require('../modules/chatModule')
 chatModule.initialize(server)
 /**
  * Listen on provided port, on all network interfaces.

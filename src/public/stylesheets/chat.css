@@ -253,6 +253,7 @@ input:hover {
     background: none;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 .chat-header {

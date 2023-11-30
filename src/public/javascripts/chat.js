@@ -1,6 +1,7 @@
 const socket = io();
+let username;
 $(document).ready(function() {
-  
+  socket.on("send username", (user) => username = user)
 
   socket.on("load chat", (chatData) => {
     console.log(chatData)
@@ -35,10 +36,10 @@ $(document).ready(function() {
     </div>
     `;
     chatMessages.append(messageHtml);
+    chatMessages.scrollTop(chatMessages[0].scrollHeight);
   }
-  function addSelfMessage(message) {
-    let chatMessages = currentChat.chatContent.find(".chat-messages");
-    const timestamp = getCurrentTime();
+  function addSelfMessage(message, timestamp, chatId) {
+    let chatMessages = getChatData(chatId).chatContent.find(".chat-messages");
     const messageHtml =`
     <div class="chat-message-self">
       <div class="chat-message-bubble">
@@ -159,7 +160,7 @@ $(document).ready(function() {
 
   //Chat creation
 
-  chatList = []
+  var chatList = []
   let currentChat;
   function getChatData(uid) {
     return chatList.find((e) => e.uid == uid)
@@ -232,6 +233,10 @@ $(document).ready(function() {
 			</div>
 		  </div>
     `)
+    chatData['loaded'] = true;
+    chatData['container'] = containerDiv;
+    chatData['chatContent'] = chatHtml;
+    chatData['chatSettings'] = chatSettingsHtml;
 
     //Open/Close chat settings
     let openChatSettingsButton = chatHtml.find(".current-chat-settings-button");
@@ -251,16 +256,26 @@ $(document).ready(function() {
           const message = $(this).val(); 
           if (message.trim() !== '') { 
               socket.emit("send message", message, chatData.uid)
-              addSelfMessage(message)
+              addSelfMessage(message,  getCurrentTime(), chatData.uid)
               $(this).val('');
           }
       }
     });
+    
 
-    chatData['loaded'] = true;
-    chatData['container'] = containerDiv;
-    chatData['chatContent'] = chatHtml;
-    chatData['chatSettings'] = chatSettingsHtml;
+    
+
+    //load chatData messages
+    for(msg of chatData.messages) {
+      if(msg.username == username) {
+        addSelfMessage(msg.message, msg.timestamp, chatData.uid)
+      } else {
+        addIncomingMessage(msg.username, msg.message, msg.timestamp, chatData.uid)
+      }
+    }
+    //todo auto scroll to bottom after loading messages
+
+    
     containerDiv.append(chatHtml);
     containerDiv.append(chatSettingsHtml);
     chatContainer.append(containerDiv);
@@ -270,7 +285,7 @@ $(document).ready(function() {
     chatList.push(chatData)
     const chatListHTML = $("#chat-list");
     let lastMessageData = chatData.messages[chatData.messages.length - 1]
-    let lastMessage = lastMessageData ? `${lastMessageData.username}: ${lastMessageData.message}` : ""
+    let lastMessage = lastMessageData ? `${lastMessageData.username == username ? 'You' : lastMessageData.username}: ${lastMessageData.message}` : ""
     let lastMessageTimestamp = lastMessageData ? lastMessageData.timestamp : ""
     let chatItem = $(`
     <button type="button" class="chat-list-item">

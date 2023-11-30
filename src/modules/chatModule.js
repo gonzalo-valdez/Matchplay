@@ -66,7 +66,10 @@ function updateDescription(adminId, chatId, description) {
 
 let chatInvites = []
 function generateChatInviteId(adminId, chatId, uses) {
-  //check if adminid is admin 
+  let data = getChatData(chatId)
+  if(!data) return false
+  if(!data.admins.includes(adminId)) return false
+  
   let inviteData = {'userId': adminId,'chatId': chatId, 'uses': uses}
   let uid = new Snowflake()
   chatInvites[uid.getUniqueID()] = inviteData
@@ -83,6 +86,14 @@ function consumeChatInvite(userId, inviteId) {
   }
 }
 
+function addMessage(messageData, chatId) {
+  let chat = getChatData(chatId)
+  if(chat) {
+    chat.messages.push(messageData)
+    return true
+  } 
+  return false
+}
 
 let funcs = []
 funcs.initialize = function(server) {
@@ -94,8 +105,8 @@ funcs.initialize = function(server) {
     if(!userData){
       return
     }
-
-    for(chatId in userData.chats) {
+    socket.emit("send username", userData.username)
+    for(chatId of userData.chats) {
       //send all chatData to client
       let data = getChatData(chatId)
       console.log(data)
@@ -113,6 +124,7 @@ funcs.initialize = function(server) {
 
     socket.on("send message", (message, chatId) => {
       let messageData = {username: userData.username, timestamp: getCurrentTime(), message: message}
+      addMessage(messageData, chatId)
       socket.to(chatId).emit("receive message", messageData, chatId)
     })
 
