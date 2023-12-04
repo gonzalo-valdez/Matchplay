@@ -175,6 +175,7 @@ input:hover {
     margin-right: 20px;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
+    overflow-x: hidden;
 }
 
 .chat-list-item .chat-info-timestamp {
@@ -468,6 +469,38 @@ i {
 .chat-settings-image {
     align-self: center;
 }
+
+.invite-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+}
+
+.generate-invite-button {
+    font-size: 18px;
+    width: auto;
+    border-radius: 10px;
+    align-self: center;
+    padding: 5px 20px;
+    margin: 5px;
+    background: var(--self-color);
+    
+}
+.copy-invite-button {
+    margin: 10px;
+    height: 40px;
+    width: 40px;
+}
+.copy-invite-button i {
+    font-size: 20px;
+}
+.generated-invite-link {
+    width: 100px;
+    overflow-x: hidden;
+}
+
+
 
 .chat-settings-members-container {
     border-top: 1px solid var(--border-color);

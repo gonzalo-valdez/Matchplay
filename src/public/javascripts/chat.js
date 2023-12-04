@@ -7,6 +7,11 @@ $(document).ready(function() {
     console.log(chatData)
     createChat(chatData)
   })
+
+  socket.on("receive invite id", (chatData, inviteURL) => {
+    getChatData(chatData.uid).chatSettings.find(".generated-invite-link").html(inviteURL)
+  })
+
   socket.on("receive message", (messageData, chatId) => {
     addIncomingMessage(messageData.username, messageData.message, messageData.timestamp, chatId)
   })
@@ -29,7 +34,7 @@ $(document).ready(function() {
       <div class="chat-message-bubble">
         <div class="message-data">
           <span class="chat-message-bubble-username">${sender}</span>
-          <span class="chat-message-text">${message}?</span>
+          <span class="chat-message-text">${message}</span>
         </div>
         <h6 class="chat-message-timestamp">${timestamp}</h6>
       </div>
@@ -158,6 +163,24 @@ $(document).ready(function() {
     createChatTab.show();
   })
 
+  const createChatButton = $("#create-chat-button");
+  createChatButton.click(function(e){
+    e.stopPropagation();
+    const chatNameInput = $("#popup-create-chatname");
+    toggleJoinCreatePopup();
+    socket.emit("create chat", chatNameInput.val())
+  })
+
+  const joinChatButton = $("#join-chat-button");
+  joinChatButton.click((e) => {
+    e.stopPropagation();
+    const chatIdInput = $("#popup-join-chatid");
+    toggleJoinCreatePopup();
+    socket.emit("use invite id", chatIdInput.val()) 
+  })
+
+
+
   //Chat creation
 
   var chatList = []
@@ -176,7 +199,7 @@ $(document).ready(function() {
     }
   }
   function openChat(uid) {
-    let chatContainer = $("#chat-container");
+    let chatContainer = $("#chat-container")
     let chatData = getChatData(uid);
     currentChat = chatData;
     if(chatData.loaded) {
@@ -210,9 +233,15 @@ $(document).ready(function() {
 			  <h4 class="chat-settings-sidebar-title">Chat Info</h4>
 			  <button class="close-chat-settings-button"><i class="bi bi-x-circle-fill"></i></button>
 			</div>
-			
+			<div class="invite-section">
+				<button class="generate-invite-button">Generate Invite Link</button>
+				<button class="copy-invite-button">copy<i class="bi bi-clipboard"></i></button>
+				<p class="generated-invite-link"></p>
+			</div>
 			<h2 class="chat-settings-name-current">${chatData.chatName}</h2>
 			<img class="chat-settings-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
+			
+			
 			<h2 class="chat-settings-description-title">
 			  Description
 			  <button class="edit-description-button"><i class="bi bi-pencil-fill"></i></button>
@@ -262,8 +291,17 @@ $(document).ready(function() {
       }
     });
     
-
+    //generate invite
+    chatSettingsHtml.find(".generate-invite-button").click((e) => {
+      e.stopPropagation()
+      socket.emit("generate invite", chatData)
+    })
     
+    //copy invite
+    chatSettingsHtml.find(".copy-invite-button").click((e) => {
+      e.stopPropagation()
+      navigator.clipboard.writeText(chatSettingsHtml.find(".generated-invite-link").text())
+    })
 
     //load chatData messages
     for(msg of chatData.messages) {
@@ -316,14 +354,6 @@ $(document).ready(function() {
   }
 
 
-
-  const createChatButton = $("#create-chat-button");
-  createChatButton.click(function(e){
-    e.stopPropagation();
-    const chatNameInput = $("#popup-create-chatname");
-    toggleJoinCreatePopup();
-    socket.emit("create chat", chatNameInput.val())
-  })
 
 });
   

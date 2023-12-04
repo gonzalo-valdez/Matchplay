@@ -32,7 +32,7 @@ function getCurrentTime() {
 function promoteMember(adminId, memberId, chatId) {
   chatData.find((chat) => {
     if(chat.uid == chatId && chat.admins.includes(adminId) && chat.members.includes(memberId)) {
-      chat.admins.append(memberId)
+      chat.admins.push(memberId)
     }
   })
 }
@@ -46,13 +46,12 @@ function kickMember(adminId, memberId, chatId) {
 }
 
 function addMember(userId, chatId) {
-  chatData.find((chat) => {
+  return chatData.find((chat) => {
     if(chat.uid == chatId) {
-      chat.members.append(userId)
+      chat.members.push(userId)
       return true
     }
   })
-  return false
 }
 
 function updateDescription(adminId, chatId, description) {
@@ -64,26 +63,31 @@ function updateDescription(adminId, chatId, description) {
 }
 
 
-let chatInvites = []
+let chatInvites = {}
 function generateChatInviteId(adminId, chatId, uses) {
   let data = getChatData(chatId)
   if(!data) return false
   if(!data.admins.includes(adminId)) return false
   
   let inviteData = {'userId': adminId,'chatId': chatId, 'uses': uses}
-  let uid = new Snowflake()
-  chatInvites[uid.getUniqueID()] = inviteData
-  return uid.getUniqueID()
+  let sf = new Snowflake()
+  let uid = sf.getUniqueID().toString()
+  chatInvites[uid] = inviteData
+  return uid
 }
 
 function consumeChatInvite(userId, inviteId) {
+  console.log(chatInvites, inviteId)
   if(chatInvites[inviteId]){
-    addMember(userId, chatInvites[inviteId].chatId)
+    let chatId = chatInvites[inviteId].chatId
+    addMember(userId, chatId)
     chatInvites[inviteId].uses = chatInvites[inviteId].uses - 1
     if(chatInvites[inviteId].uses <= 0) {
-      chatInvites.delete(inviteId)
+      delete chatInvites[inviteId]
     }
+    return chatId
   }
+  return false
 }
 
 function addMessage(messageData, chatId) {
@@ -128,6 +132,20 @@ funcs.initialize = function(server) {
       socket.to(chatId).emit("receive message", messageData, chatId)
     })
 
+    socket.on("generate invite", (chatData) => {
+      let inviteId = generateChatInviteId(userData.uid, chatData.uid, 1)
+      socket.emit("receive invite id", chatData, inviteId)
+    })
+
+    socket.on("use invite id", (inviteId) => {
+      let chatId = consumeChatInvite(userData.uid, inviteId)
+      if(chatId == false) {
+        return //later emit error to show "invite id not valid"
+      }
+      let data = getChatData(chatId)
+      socket.join(chatId)
+      socket.emit("load chat", data)
+    })
   })  
 
 }
