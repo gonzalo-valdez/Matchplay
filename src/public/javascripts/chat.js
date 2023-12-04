@@ -25,7 +25,6 @@ $(document).ready(function() {
 
   // CHAT MESSAGING
 
-  
   function addIncomingMessage(sender, message, timestamp, chatId) {
     let chatMessages = getChatData(chatId).chatContent.find(".chat-messages");
     const messageHtml = `
@@ -191,7 +190,7 @@ $(document).ready(function() {
 
   function hideChats(){
     for(chat of chatList){
-      if(chat.loaded){
+      if(chat.created){
         chat.container.hide();
         chat.chatSettings.hide();
         chat.chatContent.show();
@@ -202,9 +201,11 @@ $(document).ready(function() {
     let chatContainer = $("#chat-container")
     let chatData = getChatData(uid);
     currentChat = chatData;
-    if(chatData.loaded) {
+    if(chatData.created) {
       hideChats();
       chatData.container.show();
+      let chatMessages = chatData.chatContent.find(".chat-messages") //scroll to bottom
+      chatMessages.scrollTop(chatMessages[0].scrollHeight)
       return
     }
     let containerDiv = $("<div class='chat-content-container' style='display:none'></div>");
@@ -262,7 +263,7 @@ $(document).ready(function() {
 			</div>
 		  </div>
     `)
-    chatData['loaded'] = true;
+    chatData['created'] = true;
     chatData['container'] = containerDiv;
     chatData['chatContent'] = chatHtml;
     chatData['chatSettings'] = chatSettingsHtml;
