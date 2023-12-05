@@ -4,12 +4,12 @@ const database = require('../database')
 
 let chatData = []
 
-function generateChatData(userId, chatName) {
+function generateChatData(userData, chatName) {
   let uid = new Snowflake();
-
   let data = {'uid': uid.getUniqueID().toString(), 'chatName': chatName, 'description': "", 
-    'members': [userId], 'admins': [userId], 'messages': [], 'founder': userId,
+    'members': {}, 'admins': [userData.uid], 'messages': [], 'founder': userData.uid
   };
+  data.members[userData.uid] = userData.username
   chatData.push(data);
   return data;
 }
@@ -29,38 +29,17 @@ function getCurrentTime() {
   return `${hours}:${minutes}`;
 }
 
-function promoteMember(adminId, memberId, chatId) {
-  chatData.find((chat) => {
-    if(chat.uid == chatId && chat.admins.includes(adminId) && chat.members.includes(memberId)) {
-      chat.admins.push(memberId)
-    }
-  })
-}
 
-function kickMember(adminId, memberId, chatId) {
-  chatData.find((chat) => {
-    if(chat.uid == chatId && chat.admins.includes(adminId) && chat.members.includes(memberId) && chat.founder != memberId) {
-      chat.members.splice(chat.members.indexOf(memberId), 1)
-    }
-  })
-}
-
-function addMember(userId, chatId) {
+function addMember(userData, chatId) {
   return chatData.find((chat) => {
     if(chat.uid == chatId) {
-      chat.members.push(userId)
+      chat.members[userData.uid] = userData.username
+      database.users.joinChat(userData.uid, chatId)
       return true
     }
   })
 }
 
-function updateDescription(adminId, chatId, description) {
-  chatData.find((chat) => {
-    if(chat.uid == chatId && chat.admins.includes(adminId)) {
-      chat.description = description
-    }
-  })
-}
 
 
 let chatInvites = {}
@@ -76,10 +55,10 @@ function generateChatInviteId(adminId, chatId, uses) {
   return uid
 }
 
-function consumeChatInvite(userId, inviteId) {
+function consumeChatInvite(userData, inviteId) {
   if(chatInvites[inviteId]){
     let chatId = chatInvites[inviteId].chatId
-    addMember(userId, chatId)
+    addMember(userData, chatId)
     chatInvites[inviteId].uses = chatInvites[inviteId].uses - 1
     if(chatInvites[inviteId].uses <= 0) {
       delete chatInvites[inviteId]
@@ -108,7 +87,7 @@ funcs.initialize = function(server) {
     if(!userData){
       return
     }
-    socket.emit("send username", userData.username)
+    socket.emit("send userData", {username: userData.username, userId: userData.uid})
     for(chatId of userData.chats) {
       //send all chatData to client
       let data = getChatData(chatId)
@@ -118,7 +97,7 @@ funcs.initialize = function(server) {
     }
 
     socket.on("create chat", (chatName) => {
-      let data = generateChatData(userData.uid, chatName)
+      let data = generateChatData(userData, chatName)
       database.users.joinChat(userData.uid, data.uid)
       socket.join(data.uid)
       socket.emit("load chat", data)
@@ -138,7 +117,7 @@ funcs.initialize = function(server) {
 
     socket.on("use invite id", (inviteId) => {
       let userData = database.users.verifyToken(userToken)
-      let chatId = consumeChatInvite(userData.uid, inviteId)
+      let chatId = consumeChatInvite(userData, inviteId)
       if(chatId == false) {
         return //later emit error to show "invite id not valid"
       }

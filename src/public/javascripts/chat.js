@@ -1,7 +1,13 @@
 const socket = io();
-let username;
+var username;
+var userId;
+var chatList = []
+var currentChat;
 $(document).ready(function() {
-  socket.on("send username", (user) => username = user)
+  socket.on("send userData", (userData) => {
+    username = userData.username
+    userId = userData.userId
+  })
 
   socket.on("load chat", (chatData) => {
     createChat(chatData)
@@ -81,18 +87,54 @@ $(document).ready(function() {
   function increaseUnreadMessages(chatId) {
     let chatData = getChatData(chatId)
     if(chatData) {
+      let item = chatData.chatItem.find(".chat-unread-messages")
       chatData.unreadMessages += 1;
-      chatData.chatItem.find(".chat-unread-messages").html(chatData.unreadMessages)
+      item.html(chatData.unreadMessages)
+      item.show()
     }
   }
   function clearUnreadMessages(chatId){
     let chatData = getChatData(chatId)
-    if(chatData) {
-      chatData.unreadMessages = 0;
-      chatData.chatItem.find(".chat-unread-messages").html(chatData.unreadMessages)
-    }
-  }
+    if(!chatData)
+      return false
 
+    let item = chatData.chatItem.find(".chat-unread-messages")
+    item.hide()
+    chatData.unreadMessages = 0;
+    item.html(chatData.unreadMessages)
+  
+  }
+  function addChatMember(userData, chatId) {
+    let chatData = getChatData(chatId)
+    if(!chatData)
+      return false
+
+    let adminRank = ""
+    if(chatData.admins.includes(userData.uid)){
+      adminRank = "Admin"
+    } 
+    if (chatData.founder == userData.uid) {
+      adminRank = "Founder"
+    }
+
+    let membersList = chatData.chatSettings.find(".chat-settings-members-list")
+    let chatMember = $(`<div class="chat-member">
+      <h4 class="chat-member-username">${userData.username}</h4>
+      <p class="chat-member-adminrank">${adminRank}</p>
+    </div>`)
+
+    //add buttons if my userId is admin and if userData isnt admin/founder
+    let chatMemberPromoteButton = $(`<button class="promote-member-button"><i class="bi bi-chevron-double-up"></i></button>`)
+    let chatMemberKickButton = $(`<button class="kick-member-button"><i class="bi bi-x-circle"></i></button>`)
+
+    if(chatData.admins.includes(userId) && !chatData.admins.includes(userData.uid) && chatData.founder != userData.uid) {
+      //connect onclick todo
+      chatMember.append(chatMemberPromoteButton)
+      chatMember.append(chatMemberKickButton)
+    }
+
+    membersList.append(chatMember)
+  }
 
 
   
@@ -214,8 +256,7 @@ $(document).ready(function() {
 
   //Chat creation
 
-  var chatList = []
-  var currentChat;
+  
   function getChatData(uid) {
     return chatList.find((e) => e.uid == uid)
   }
@@ -267,11 +308,7 @@ $(document).ready(function() {
 			  <h4 class="chat-settings-sidebar-title">Chat Info</h4>
 			  <button class="close-chat-settings-button"><i class="bi bi-x-circle-fill"></i></button>
 			</div>
-			<div class="invite-section">
-				<button class="generate-invite-button">Generate Invite Link</button>
-				<button class="copy-invite-button">copy<i class="bi bi-clipboard"></i></button>
-				<p class="generated-invite-link"></p>
-			</div>
+			
 			<h2 class="chat-settings-name-current">${chatData.chatName}</h2>
 			<img class="chat-settings-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
 			
@@ -286,20 +323,35 @@ $(document).ready(function() {
 			<div class="chat-settings-members-container">
 			  <h2 class="chat-members-title">Chat members</h2>
 			  <div class="chat-settings-members-list">
-				<div class="chat-member">
-				  <h4 class="chat-member-username">pibe1</h4>
-				  <p class="chat-member-adminrank">Founder</p>
-				  <button class="promote-member-button"><i class="bi bi-chevron-double-up"></i></button>
-				  <button class="kick-member-button"><i class="bi bi-x-circle"></i></button>
-				</div>
+				
 			  </div>
 			</div>
 		  </div>
     `)
+    // add elements if ADMIN
+    let invSection = $(`<div class="invite-section">
+        <button class="generate-invite-button">Generate Invite Link</button>
+        <button class="copy-invite-button">copy<i class="bi bi-clipboard"></i></button>
+        <p class="generated-invite-link"></p>
+      </div`)
+    
+    if(chatData.admins.includes(userId)) {
+      invSection.insertAfter(chatSettingsHtml.find(".chat-header"))
+    }
+
+
     chatData['created'] = true;
     chatData['container'] = containerDiv;
     chatData['chatContent'] = chatHtml;
     chatData['chatSettings'] = chatSettingsHtml;
+
+
+    //load members
+
+    for(const [uid,username] of Object.entries(chatData.members)) {
+      addChatMember({uid: uid, username: username},chatData.uid)
+    }
+
 
     //Open/Close chat settings
     let openChatSettingsButton = chatHtml.find(".current-chat-settings-button");
@@ -344,7 +396,7 @@ $(document).ready(function() {
       } else if(msg.username == username) {
         addSelfMessage(msg.message, msg.timestamp, chatData.uid)
       } else {
-        addIncomingMessage(msg.username, msg.message, msg.timestamp, chatData.uid)
+        addIncomingMessage(msg, chatData.uid)
       }
     }
     //todo auto scroll to bottom after loading messages
@@ -355,6 +407,9 @@ $(document).ready(function() {
     chatContainer.append(containerDiv);
   }
 
+
+
+  //create chat
   function createChat(chatData) {
     const chatListHTML = $("#chat-list");
 
@@ -386,7 +441,7 @@ $(document).ready(function() {
 
         <div class="chat-info-preview">
           <span class="chat-last-message">${lastMessage}</span>
-          <span class="chat-unread-messages"></span>
+          <span class="chat-unread-messages" style="display:none"></span>
         </div>
       </div>
     </button>`)

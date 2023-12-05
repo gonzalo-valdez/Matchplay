@@ -542,6 +542,7 @@ i {
 }
 
 .chat-member-adminrank {
+    margin-right: auto;
     color: #909090;
     font-style: italic;
 }
