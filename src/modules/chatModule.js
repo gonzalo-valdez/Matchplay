@@ -77,7 +77,6 @@ function generateChatInviteId(adminId, chatId, uses) {
 }
 
 function consumeChatInvite(userId, inviteId) {
-  console.log(chatInvites, inviteId)
   if(chatInvites[inviteId]){
     let chatId = chatInvites[inviteId].chatId
     addMember(userId, chatId)
@@ -113,9 +112,8 @@ funcs.initialize = function(server) {
     for(chatId of userData.chats) {
       //send all chatData to client
       let data = getChatData(chatId)
-      console.log(data)
       socket.emit("load chat", data)
-
+  
       socket.join(chatId) //todo leave rooms on kickmember, join on add member
     }
 
@@ -127,6 +125,7 @@ funcs.initialize = function(server) {
     })
 
     socket.on("send message", (message, chatId) => {
+      let userData = database.users.verifyToken(userToken)
       let messageData = {username: userData.username, timestamp: getCurrentTime(), message: message}
       addMessage(messageData, chatId)
       socket.to(chatId).emit("receive message", messageData, chatId)
@@ -138,11 +137,17 @@ funcs.initialize = function(server) {
     })
 
     socket.on("use invite id", (inviteId) => {
+      let userData = database.users.verifyToken(userToken)
       let chatId = consumeChatInvite(userData.uid, inviteId)
       if(chatId == false) {
         return //later emit error to show "invite id not valid"
       }
       let data = getChatData(chatId)
+
+      let joinedMsg = {username: userData.username, message: `${userData.username} has joined the chat.`,timestamp: getCurrentTime(), joinedleft: true}
+      socket.to(chatId).emit("receive user joinedleft", joinedMsg, chatId)
+      addMessage(joinedMsg, chatId)
+
       socket.join(chatId)
       socket.emit("load chat", data)
     })

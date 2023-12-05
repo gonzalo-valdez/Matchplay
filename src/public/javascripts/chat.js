@@ -4,7 +4,6 @@ $(document).ready(function() {
   socket.on("send username", (user) => username = user)
 
   socket.on("load chat", (chatData) => {
-    console.log(chatData)
     createChat(chatData)
   })
 
@@ -13,9 +12,15 @@ $(document).ready(function() {
   })
 
   socket.on("receive message", (messageData, chatId) => {
-    addIncomingMessage(messageData.username, messageData.message, messageData.timestamp, chatId)
+    addIncomingMessage(messageData, chatId)
+    if(currentChat && currentChat.uid != chatId) {
+      increaseUnreadMessages(chatId)
+    }
   })
-
+  
+  socket.on("receive user joinedleft", (messageData, chatId) => {
+    userJoinedLeftMessage(messageData, chatId)
+  })
   function getCurrentTime() {
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0'); // Pad with leading zero if needed
@@ -25,21 +30,22 @@ $(document).ready(function() {
 
   // CHAT MESSAGING
 
-  function addIncomingMessage(sender, message, timestamp, chatId) {
+  function addIncomingMessage(messageData, chatId) {
     let chatMessages = getChatData(chatId).chatContent.find(".chat-messages");
     const messageHtml = `
     <div class="chat-message-others">
       <img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
       <div class="chat-message-bubble">
         <div class="message-data">
-          <span class="chat-message-bubble-username">${sender}</span>
-          <span class="chat-message-text">${message}</span>
+          <span class="chat-message-bubble-username">${messageData.username}</span>
+          <span class="chat-message-text">${messageData.message}</span>
         </div>
-        <h6 class="chat-message-timestamp">${timestamp}</h6>
+        <h6 class="chat-message-timestamp">${messageData.timestamp}</h6>
       </div>
     </div>
     `;
     chatMessages.append(messageHtml);
+    setLastMessage(messageData, chatId)
     chatMessages.scrollTop(chatMessages[0].scrollHeight);
   }
   function addSelfMessage(message, timestamp, chatId) {
@@ -55,11 +61,37 @@ $(document).ready(function() {
     </div>
     `;
     chatMessages.append(messageHtml);
+    setLastMessage({message: message, timestamp: timestamp}, chatId)
     chatMessages.scrollTop(chatMessages[0].scrollHeight);
   }
+  function userJoinedLeftMessage(messageData, chatId) {
+    let messageHtml = `<p class="user-joined-left-message">${messageData.message}</p>`
+    let chatMessages = getChatData(chatId).chatContent.find(".chat-messages");
+    chatMessages.append(messageHtml);
+    chatMessages.scrollTop(chatMessages[0].scrollHeight);
+    setLastMessage(messageData, chatId)
+  }
 
-
+  function setLastMessage(messageData, chatId) {
+    let chatItem = getChatData(chatId).chatItem
+    chatItem.find(".chat-timestamp").html(messageData.timestamp)
+    chatItem.find(".chat-last-message").html(`${messageData.joinedleft ? "" : messageData.username + ": "} ${messageData.message}`)
+  }
   
+  function increaseUnreadMessages(chatId) {
+    let chatData = getChatData(chatId)
+    if(chatData) {
+      chatData.unreadMessages += 1;
+      chatData.chatItem.find(".chat-unread-messages").html(chatData.unreadMessages)
+    }
+  }
+  function clearUnreadMessages(chatId){
+    let chatData = getChatData(chatId)
+    if(chatData) {
+      chatData.unreadMessages = 0;
+      chatData.chatItem.find(".chat-unread-messages").html(chatData.unreadMessages)
+    }
+  }
 
 
 
@@ -183,7 +215,7 @@ $(document).ready(function() {
   //Chat creation
 
   var chatList = []
-  let currentChat;
+  var currentChat;
   function getChatData(uid) {
     return chatList.find((e) => e.uid == uid)
   }
@@ -206,6 +238,7 @@ $(document).ready(function() {
       chatData.container.show();
       let chatMessages = chatData.chatContent.find(".chat-messages") //scroll to bottom
       chatMessages.scrollTop(chatMessages[0].scrollHeight)
+      clearUnreadMessages(uid)
       return
     }
     let containerDiv = $("<div class='chat-content-container' style='display:none'></div>");
@@ -306,7 +339,9 @@ $(document).ready(function() {
 
     //load chatData messages
     for(msg of chatData.messages) {
-      if(msg.username == username) {
+      if(msg.joinedleft) {
+        userJoinedLeftMessage(msg, chatData.uid)
+      } else if(msg.username == username) {
         addSelfMessage(msg.message, msg.timestamp, chatData.uid)
       } else {
         addIncomingMessage(msg.username, msg.message, msg.timestamp, chatData.uid)
@@ -321,11 +356,21 @@ $(document).ready(function() {
   }
 
   function createChat(chatData) {
-    chatList.push(chatData)
     const chatListHTML = $("#chat-list");
+
     let lastMessageData = chatData.messages[chatData.messages.length - 1]
-    let lastMessage = lastMessageData ? `${lastMessageData.username == username ? 'You' : lastMessageData.username}: ${lastMessageData.message}` : ""
-    let lastMessageTimestamp = lastMessageData ? lastMessageData.timestamp : ""
+    let lastMessage = "";
+    let lastMessageTimestamp = "";
+    if(lastMessageData) {
+      lastMessageTimestamp = lastMessageData.timestamp 
+      if("joinedleft" in lastMessageData) {
+        lastMessage = `${lastMessageData.username} has ${lastMessageData.joinedleft ? 'joined' : 'left'} the chat.`
+      } else {
+        lastMessage = `${lastMessageData.username == username ? 'You' : lastMessageData.username}: ${lastMessageData.message}` 
+      }
+    }
+
+   
     let chatItem = $(`
     <button type="button" class="chat-list-item">
       <img class="chat-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
@@ -341,16 +386,21 @@ $(document).ready(function() {
 
         <div class="chat-info-preview">
           <span class="chat-last-message">${lastMessage}</span>
-          <span class="chat-unread-messages">24</span>
+          <span class="chat-unread-messages"></span>
         </div>
       </div>
     </button>`)
+
+    chatData['chatItem'] = chatItem
+    chatList.push(chatData)
 
     chatListHTML.append(chatItem);
     chatItem.click(function(e){
       openChat(chatData.uid);
     });
     openChat(chatData.uid)
+
+    
     return chatData;
   }
 

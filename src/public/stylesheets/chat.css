@@ -386,6 +386,16 @@ i {
     border-radius: 10px;
 }
 
+.user-joined-left-message {
+    background: var(--secondary-color);
+    max-width: 400px;
+    border-radius: 10px;
+    padding: 5px;
+    text-align: center;
+    margin: 5px auto;
+}
+
+
 
 /* SCROLL BAR */
 
