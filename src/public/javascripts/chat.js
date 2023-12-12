@@ -27,6 +27,11 @@ $(document).ready(function() {
   socket.on("receive user joinedleft", (messageData, chatId) => {
     userJoinedLeftMessage(messageData, chatId)
   })
+
+  socket.on("leave chat", (chatId) => {
+    leaveChat(chatId)
+  })
+
   function getCurrentTime() {
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, '0'); // Pad with leading zero if needed
@@ -67,7 +72,7 @@ $(document).ready(function() {
     </div>
     `;
     chatMessages.append(messageHtml);
-    setLastMessage({message: message, timestamp: timestamp}, chatId)
+    setLastMessage({username:'You', message: message, timestamp: timestamp}, chatId)
     chatMessages.scrollTop(chatMessages[0].scrollHeight);
   }
   function userJoinedLeftMessage(messageData, chatId) {
@@ -280,6 +285,7 @@ $(document).ready(function() {
       let chatMessages = chatData.chatContent.find(".chat-messages") //scroll to bottom
       chatMessages.scrollTop(chatMessages[0].scrollHeight)
       clearUnreadMessages(uid)
+      chatData.chatContent.find(".chat-input-box").focus() //focus chat input
       return
     }
     let containerDiv = $("<div class='chat-content-container' style='display:none'></div>");
@@ -308,7 +314,7 @@ $(document).ready(function() {
 			  <h4 class="chat-settings-sidebar-title">Chat Info</h4>
 			  <button class="close-chat-settings-button"><i class="bi bi-x-circle-fill"></i></button>
 			</div>
-			
+			<button class="leave-chat-button">LEAVE</button>
 			<h2 class="chat-settings-name-current">${chatData.chatName}</h2>
 			<img class="chat-settings-image" src="https://api-private.atlassian.com/users/cb85ff85de1b228dc2759792e63e728e/avatar" alt="" draggable="false">
 			
@@ -328,6 +334,7 @@ $(document).ready(function() {
 			</div>
 		  </div>
     `)
+
     // add elements if ADMIN
     let invSection = $(`<div class="invite-section">
         <button class="generate-invite-button">Generate Invite Link</button>
@@ -389,6 +396,14 @@ $(document).ready(function() {
       navigator.clipboard.writeText(chatSettingsHtml.find(".generated-invite-link").text())
     })
 
+
+    //leave chat
+    chatSettingsHtml.find(".leave-chat-button").click((e) => {
+      e.stopPropagation()
+      socket.emit("leave chat", chatData)
+    })
+
+
     //load chatData messages
     for(msg of chatData.messages) {
       if(msg.joinedleft) {
@@ -406,6 +421,12 @@ $(document).ready(function() {
     containerDiv.append(chatSettingsHtml);
     chatContainer.append(containerDiv);
   }
+
+
+
+
+
+
 
 
 
@@ -457,6 +478,20 @@ $(document).ready(function() {
 
     
     return chatData;
+  }
+
+
+
+
+  //leave chat
+
+
+  function leaveChat(uid) {
+    let chatData = getChatData(uid);
+    if(chatData) {
+      chatData.container.remove();
+      chatData.chatItem.remove();
+    }
   }
 
 

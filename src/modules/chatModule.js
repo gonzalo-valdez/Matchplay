@@ -22,6 +22,33 @@ function getChatData(chatId) {
   })
 }
 
+function deleteChat(chatId) {
+  for(let i = 0; i < chatData.length; i++) {
+    if(chatData[i].uid == chatId) {
+      chatData.splice(i,i)
+      return true
+    }
+  }
+  return false
+}
+
+
+
+function leaveChat(userData, chatId) {
+  let chat = getChatData(chatId);
+  if(chat) {
+    database.users.leaveChat(userData.uid, chatId)
+    delete chat.members[userData.uid]
+    if(userData.uid in chat.admins)
+      delete chat.admins[userData.uid]
+
+    if(Object.keys(chat.members).length <= 0) {
+      deleteChat(chatId)
+    }
+  }
+}
+
+
 function getCurrentTime() {
   const now = new Date();
   const hours = now.getHours().toString().padStart(2, '0'); // Pad with leading zero if needed
@@ -31,13 +58,12 @@ function getCurrentTime() {
 
 
 function addMember(userData, chatId) {
-  return chatData.find((chat) => {
-    if(chat.uid == chatId) {
-      chat.members[userData.uid] = userData.username
-      database.users.joinChat(userData.uid, chatId)
-      return true
-    }
-  })
+  let chat = getChatData(chatId)
+  if(chat) {
+    chat.members[userData.uid] = userData.username
+    database.users.joinChat(userData.uid, chatId)
+    return true
+  }
 }
 
 
@@ -93,7 +119,7 @@ funcs.initialize = function(server) {
       let data = getChatData(chatId)
       socket.emit("load chat", data)
   
-      socket.join(chatId) //todo leave rooms on kickmember, join on add member
+      socket.join(chatId) //todo leave rooms on kickmember/leave
     }
 
     socket.on("create chat", (chatName) => {
@@ -130,8 +156,26 @@ funcs.initialize = function(server) {
       socket.join(chatId)
       socket.emit("load chat", data)
     })
-  })  
 
+    socket.on("leave chat", (chatData) => {
+      let chatId = chatData.uid
+      let userData = database.users.verifyToken(userToken)
+      leaveChat(userData, chatId)
+      socket.leave(chatId)
+      socket.emit("leave chat", chatId)
+
+      let joinedMsg = {username: userData.username, message: `${userData.username} has left the chat.`,timestamp: getCurrentTime(), joinedleft: true}
+      socket.to(chatId).emit("receive user joinedleft", joinedMsg, chatId)
+    })
+
+
+
+
+
+
+
+
+  }) 
 }
 
 module.exports = funcs

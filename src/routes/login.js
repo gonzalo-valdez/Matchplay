@@ -30,7 +30,7 @@ router.post('/', (req, res) => { //login
     if (userData && userData.password == password) {
         // Create a JWT token
         console.log(userData.uid)
-        const token = database.users.signToken({'uid': userData.uid.toString(), 'username': userData.username})
+        const token = database.users.signToken({'uid': userData.uid, 'username': userData.username})
         res.cookie('token', token, {httpOnly: true});
         res.json({ success: true, message: 'Authentication successful' });
     } else {

@@ -53,6 +53,17 @@ users.joinChat = function(userId, chatId) {
     }
 }
 
+users.leaveChat = function(userId, chatId) {
+    let userData = users.getUserFromId(userId)
+    if(userData){
+        for(let i = 0; i < userData.chats.length; i++) {
+            if(userData.chats[i].uid == chatId) {
+                userData.chats.splice(i,i)
+                return true
+            }
+        }
+    }
+}
 
 users.getUserFromId = function(uid){
     return userdatabase.find((userData) => {
