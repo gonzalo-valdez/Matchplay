@@ -134,6 +134,11 @@ $(document).ready(function() {
 
     if(chatData.admins.includes(userId) && !chatData.admins.includes(userData.uid) && chatData.founder != userData.uid) {
       //connect onclick todo
+
+      chatMemberKickButton.click(function(e){
+        socket.emit("kick member", userData.uid, chatData.uid)
+      })
+
       chatMember.append(chatMemberPromoteButton)
       chatMember.append(chatMemberKickButton)
     }

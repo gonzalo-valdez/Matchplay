@@ -34,13 +34,13 @@ function deleteChat(chatId) {
 
 
 
-function leaveChat(userData, chatId) {
+function leaveChat(userId, chatId) {
   let chat = getChatData(chatId);
   if(chat) {
-    database.users.leaveChat(userData.uid, chatId)
-    delete chat.members[userData.uid]
-    if(userData.uid in chat.admins)
-      delete chat.admins[userData.uid]
+    database.users.leaveChat(userId, chatId)
+    delete chat.members[userId]
+    if(userId in chat.admins)
+      delete chat.admins[userId]
 
     if(Object.keys(chat.members).length <= 0) {
       deleteChat(chatId)
@@ -51,8 +51,8 @@ function leaveChat(userData, chatId) {
 
 function getCurrentTime() {
   const now = new Date();
-  const hours = now.getHours().toString().padStart(2, '0'); // Pad with leading zero if needed
-  const minutes = now.getMinutes().toString().padStart(2, '0'); // Pad with leading zero if needed
+  const hours = now.getHours().toString().padStart(2, '0'); 
+  const minutes = now.getMinutes().toString().padStart(2, '0');
   return `${hours}:${minutes}`;
 }
 
@@ -103,7 +103,31 @@ function addMessage(messageData, chatId) {
   return false
 }
 
+function joinRoom(userId, socket, chatId) {
+  if(!socketList[chatId]) {
+    socketList[chatId] = []
+  }
+  socket.join(chatId)
+  socketList[chatId].push({userId: userId, socket: socket})
+}
+
+function kickFromRoom(userId, chatId) {
+  if(!socketList[chatId]) 
+    return
+  let data = socketList[chatId]
+  console.log(data)
+  for(let i = 0; i < data.length; i++){
+    if(data[i].userId == userId) {
+      data[i].socket.leave(chatId)
+      let kickedmsg = {username: "You", message: `You have been kicked.`, timestamp: getCurrentTime(), joinedleft: true}
+      data[i].socket.emit("receive user joinedleft", kickedmsg)
+      delete data[i]
+    }
+  }
+}
+
 let funcs = []
+let socketList = []
 funcs.initialize = function(server) {
   var io = require('socket.io')(server)
 
@@ -119,13 +143,13 @@ funcs.initialize = function(server) {
       let data = getChatData(chatId)
       socket.emit("load chat", data)
   
-      socket.join(chatId) //todo leave rooms on kickmember/leave
+      joinRoom(userData.uid, socket, chatId)
     }
 
     socket.on("create chat", (chatName) => {
       let data = generateChatData(userData, chatName)
       database.users.joinChat(userData.uid, data.uid)
-      socket.join(data.uid)
+      joinRoom(userData.uid, socket, data.uid)
       socket.emit("load chat", data)
     })
 
@@ -153,20 +177,39 @@ funcs.initialize = function(server) {
       socket.to(chatId).emit("receive user joinedleft", joinedMsg, chatId)
       addMessage(joinedMsg, chatId)
 
-      socket.join(chatId)
+      joinRoom(userData.uid, socket, chatId)
       socket.emit("load chat", data)
     })
 
     socket.on("leave chat", (chatData) => {
       let chatId = chatData.uid
       let userData = database.users.verifyToken(userToken)
-      leaveChat(userData, chatId)
+      if(!userData.chats.find(chatId)) {
+        return
+      }
+      leaveChat(userData.uid, chatId)
       socket.leave(chatId)
       socket.emit("leave chat", chatId)
 
       let joinedMsg = {username: userData.username, message: `${userData.username} has left the chat.`,timestamp: getCurrentTime(), joinedleft: true}
       socket.to(chatId).emit("receive user joinedleft", joinedMsg, chatId)
     })
+
+    socket.on("kick member", (memberId, chatId) => {
+      let userData = database.users.verifyToken(userToken)
+      let chatData = getChatData(chatId)
+      if(!chatData.admins.find((id) => id == userData.uid) || (chatData.admins.find((id) => id == memberId) && chatData.founder != userData.uid)) { //if user not admin, or trying to kick admin but isnt founder, return
+        return
+      }
+      let memberData = database.users.getUserFromId(memberId)
+      leaveChat(memberId, chatId)
+      kickFromRoom(memberId, chatId)
+      
+      let leftmsg = {username: memberData.username, message: `${memberData.username} has been kicked.`,timestamp: getCurrentTime(), joinedleft: true}
+      io.to(chatId).emit("receive user joinedleft", leftmsg, chatId)
+      addMessage(leftmsg, chatId)
+    })
+
 
 
 
