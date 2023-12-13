@@ -25,7 +25,7 @@ function getChatData(chatId) {
 function deleteChat(chatId) {
   for(let i = 0; i < chatData.length; i++) {
     if(chatData[i].uid == chatId) {
-      chatData.splice(i,i)
+      delete chatData[i]
       return true
     }
   }

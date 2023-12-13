@@ -57,8 +57,8 @@ users.leaveChat = function(userId, chatId) {
     let userData = users.getUserFromId(userId)
     if(userData){
         for(let i = 0; i < userData.chats.length; i++) {
-            if(userData.chats[i].uid == chatId) {
-                userData.chats.splice(i,i)
+            if(userData.chats[i] == chatId) {
+                delete userData.chats[i]
                 return true
             }
         }

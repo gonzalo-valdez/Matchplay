@@ -491,6 +491,12 @@ $(document).ready(function() {
     if(chatData) {
       chatData.container.remove();
       chatData.chatItem.remove();
+      for(let i = 0; i < chatList.length; i++) {
+        if(chatList[i].uid == chatData.uid) {
+          delete chatList[i]
+          return true
+        }
+      }
     }
   }
 

@@ -6,7 +6,7 @@
     --border-color: #666;
     --text-color: #ffffff;
     --gray-text-color: #BBB;
-    --self-color: #32574c;
+    --self-color: #324957;
 }
 
 body {
@@ -176,6 +176,7 @@ input:hover {
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
     overflow-x: hidden;
+    min-height: 80%;
 }
 
 .chat-list-item .chat-info-timestamp {
