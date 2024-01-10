@@ -25,7 +25,14 @@ $(document).ready(function() {
   })
   
   socket.on("receive user joinedleft", (messageData, chatId) => {
+    console.log(messageData, chatId)
     userJoinedLeftMessage(messageData, chatId)
+    if(messageData.message == 'You have been kicked.') {
+      let chatBar = getChatData(chatId).chatContent.find(".chat-input-box")
+      chatBar.prop("disabled", true)
+      chatBar.css('background-color', '#22282c');
+      chatBar.attr('placeholder', 'You are not able to send messages');
+    }
   })
 
   socket.on("leave chat", (chatId) => {
